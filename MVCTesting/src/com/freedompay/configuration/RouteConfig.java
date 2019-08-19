@@ -1,55 +1,50 @@
 package com.freedompay.configuration;
-import com.freedompay.application.BaseView;
 import com.freedompay.controllers.*;
+import com.freedompay.models.*;
 import com.freedompay.views.*;
+import com.freedompay.services.IRouteListener;
+import com.freedompay.services.IRouteService;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RouteConfig {
+public class RouteConfig implements IRouteListener, IRouteService{
 	
-	private static BaseView baseView;
-	private static Controller controller;
-	private static View view;
+	private Controller controller = null;
+	private View view = null;
+	private Model model = null;
+	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
-	public static void init(BaseView bv) {
-		baseView = bv;
+	public void addObserver(IRouteListener o) {
+		this.observers.add(o);
 	}
 	
-	public static void setRoute(Controller c, View v) {
-		Controller cc = RouteConfig.currentController();
-		View cv = RouteConfig.currentView();
-		if(cc != null && cv != null) {
-			baseView.getContentPane().remove(cv);
-		}
-		RouteConfig.setViewAndController(c, v);
-		RouteConfig.updateBaseView();
+	public void removeObserver(IRouteListener o) {
+		this.observers.remove(o);
 	}
 	
-	public static void setViewAndController(Controller c, View v) {
-		RouteConfig.controller = c;
-		RouteConfig.view = v;
-		c.addView(v);
-		v.addController(c);
-		v.build();
-	}
-	
-	public static void updateBaseView() {
-		baseView.add(RouteConfig.currentView());
-		baseView.getContentPane().invalidate();
-		baseView.getContentPane().validate();
-	}
-	
-	public static View currentView() {
-		if(RouteConfig.view != null) {
-			return RouteConfig.view;
-		}else {
-			return null;
+	@Override
+	public void notifyObservers(Object obj) {
+		for(IRouteListener rs : observers) {
+			rs.update(obj);
 		}
 	}
 	
-	public static Controller currentController() {
-		if(RouteConfig.controller != null) {
-			return RouteConfig.controller;
-		}else {
-			return null;
+	@Override
+	public void update(Object obj) {
+		String txt = (String) obj;
+		if(txt.equalsIgnoreCase("Home") || this.controller == null) {
+			this.controller = new HomeController();
+			this.view = new HomeView();
+			this.model = null;
 		}
+		if(txt.equalsIgnoreCase("Files")) {
+			this.controller = new FileController();
+			this.view = new FileView();
+			this.model = new FileModel();
+		}
+		this.view.addController(this.controller);
+		this.controller.addView(this.view);
+		this.controller.addModel(model);
+		this.notifyObservers(this.view);
 	}
 }

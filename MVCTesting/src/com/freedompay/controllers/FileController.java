@@ -1,50 +1,56 @@
 package com.freedompay.controllers;
-import com.freedompay.components.*;
+import com.freedompay.models.Model;
 import com.freedompay.views.View;
 
-import java.awt.Image;
-import javax.swing.JLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class FileController extends Controller {
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+public class FileController extends Controller implements ActionListener{
 
 	private View view;
-	private DecisionPanel decisionPanel;
-	private ScenePanel scenePanel;
-	private StoryPanel storyPanel;
-	private Image banner;
-	private JLabel decisionLabel;
-	private JLabel sceneLabel;
-	private JLabel storyLabel;
+	private Model model;
 	
 	@Override
 	public void addView(View v) {
 		view = v;
 	}
-
-	@Override
-	public DecisionPanel buildDecisionPanel() {
-		this.decisionPanel = new DecisionPanel();
-		this.decisionLabel = new JLabel("Decision Panel - File");
-		this.decisionPanel.init();
-		this.decisionPanel.add(decisionLabel);
-		return this.decisionPanel;
+	
+	public void addModel(Model m) {
+		model = m;
 	}
-
-	@Override
-	public ScenePanel buildScenePanel() {
-		this.scenePanel = new ScenePanel();
-		this.sceneLabel = new JLabel("ScenePanel - File");
-		this.scenePanel.init();
-		this.scenePanel.add(sceneLabel);
-		return this.scenePanel;
+	
+	public JLabel getJLabel(String txt) {
+		return new JLabel(txt);
 	}
-
-	@Override
-	public StoryPanel buildStoryPanel() {
-		this.storyPanel = new StoryPanel();
-		this.storyLabel = new JLabel("StoryPanel - File");
-		this.storyPanel.init();
-		this.storyPanel.add(storyLabel);
-		return this.storyPanel;
+	
+	public JButton getButton(String txt) {
+		JButton btn = new JButton(txt);
+		btn.addActionListener(this);
+		return btn;
+	}
+	
+	public JTextField getTextField(int length) {
+		JTextField tf = new JTextField(length);
+		return tf;
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		JButton btn = (JButton) e.getSource();
+		if(btn.getText() == "Browse") {
+			this.openFileChooser();
+		}
+	}
+	
+	private void openFileChooser() {
+		JFileChooser fc = new JFileChooser("c:\\");
+		int choice = fc.showDialog(this.view, "Open");
+		if(choice == JFileChooser.APPROVE_OPTION) {
+			
+		}
 	}
 }

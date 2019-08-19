@@ -10,7 +10,6 @@ public class DecisionPanel extends JPanel {
 	
 	private int width;
 	private int height;
-
 	
 	public void init() {
 		this.setSize();
