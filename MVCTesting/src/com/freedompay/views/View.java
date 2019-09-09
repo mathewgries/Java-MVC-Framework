@@ -1,15 +1,21 @@
 package com.freedompay.views;
 
 import com.freedompay.controllers.*;
+import com.freedompay.models.FileModel;
+
+import java.util.List;
+
 import javax.swing.JPanel;
 
-public abstract class View extends JPanel {
+public class View extends JPanel {
 	
 	private static final long serialVersionUID = 8386386706268216201L;
 	
-	public abstract void addController(Controller c);
+	public void addController(Controller c) {}
 	
-	public abstract void setSize();
+	public void setSize() {}
 	
-	public abstract void build();
+	public void build() {}
+	
+	public void addFileNameToList(List<FileModel> files) {}
 }

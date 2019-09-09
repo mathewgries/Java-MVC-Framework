@@ -12,6 +12,7 @@ public class RouteConfig implements IRouteListener, IRouteService{
 	private Controller controller = null;
 	private View view = null;
 	private Model model = null;
+	private String currentRoute = null;
 	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
 	public void addObserver(IRouteListener o) {
@@ -32,19 +33,26 @@ public class RouteConfig implements IRouteListener, IRouteService{
 	@Override
 	public void update(Object obj) {
 		String txt = (String) obj;
-		if(txt.equalsIgnoreCase("Home") || this.controller == null) {
-			this.controller = new HomeController();
-			this.view = new HomeView();
-			this.model = null;
+		if(!txt.equalsIgnoreCase(this.currentRoute)) {
+			this.currentRoute = txt;
+			if(txt.equalsIgnoreCase("Home") || this.controller == null) {
+				this.controller = new HomeController();
+				this.view = new HomeView();
+			}
+			if(txt.equalsIgnoreCase("Files")) {
+				this.controller = new FileController();
+				this.view = new FileView();
+			}
+			if(txt.equalsIgnoreCase("InvalidLines")) {
+				this.controller = new InvalidLinesController();
+				this.view = new InvalidLinesView();
+			}
+			this.view.addController(this.controller);
+			this.controller.addView(this.view);
+			this.controller.addModel(model);
+			this.controller.addObserver(this);
+			
+			this.notifyObservers(this.view);
 		}
-		if(txt.equalsIgnoreCase("Files")) {
-			this.controller = new FileController();
-			this.view = new FileView();
-			this.model = new FileModel();
-		}
-		this.view.addController(this.controller);
-		this.controller.addView(this.view);
-		this.controller.addModel(model);
-		this.notifyObservers(this.view);
 	}
 }

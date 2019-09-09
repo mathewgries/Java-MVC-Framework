@@ -1,10 +1,11 @@
 package com.freedompay.views;
-import com.freedompay.controllers.Controller;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -14,9 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
-public class FileView extends View {
+import com.freedompay.controllers.Controller;
 
-	private static final long serialVersionUID = -794968485917811795L;
+public class InvalidLinesView extends View {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8610858178420512857L;
 
 	private Controller controller;
 	
@@ -98,20 +104,8 @@ public class FileView extends View {
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
-		JButton posBtn = this.controller.getPOSBtn();
-		JButton authBtn = this.controller.getAuthBtn();
-		JButton batchedBtn = this.controller.getBatchedBtn();
-		JButton clearBtn = this.controller.getClearCellBtn();
-		JButton removeBtn = this.controller.getRemoveBtn();
-		JButton checkErrorsBtn = this.controller.getFileLineValidateBtn();
-	
-		p.add(posBtn);
-		p.add(authBtn);
-		p.add(batchedBtn);
-		p.add(clearBtn);
-		p.add(removeBtn);
-		p.add(checkErrorsBtn);
-		
+		JButton backBtn = this.controller.getBackBtn();
+		p.add(backBtn);
 		return p;
 	}
 	
@@ -143,13 +137,16 @@ public class FileView extends View {
 	
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JPanel auth = this.controller.getAuthColumnList();
-		JPanel batched = this.controller.getBatchedColumnList();
+		JLabel label = this.controller.getJLabel("Invalid File Lines");
+		JScrollPane invalidLines = this.controller.getInvalidLineItemsList();
+		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
 		
-		story.setLayout(new BoxLayout(story, BoxLayout.LINE_AXIS));
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		invalidLines.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		story.add(auth);
-		story.add(batched);
+		story.add(label);
+		story.add(invalidLines);
 		return story;
 	}
+	
 }

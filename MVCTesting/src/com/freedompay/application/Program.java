@@ -1,7 +1,6 @@
 package com.freedompay.application;
 
 import javax.swing.SwingUtilities;
-import com.freedompay.components.MainMenu;
 import com.freedompay.configuration.*;
 
 public class Program {

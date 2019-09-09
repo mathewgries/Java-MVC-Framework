@@ -1,4 +1,4 @@
-package com.freedompay.components;
+package com.freedompay.application;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
 
@@ -20,6 +20,7 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 	
 	private JButton home;
 	private JButton files;
+	private JButton invalidLines;
 	private JButton exit;
 	
 	public void addObserver(IRouteListener obj) {
@@ -48,6 +49,11 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		files.setBackground(Color.WHITE);
 		files.setBorderPainted(false);
 		
+		invalidLines = new JButton("Invalid Lines");
+		invalidLines.setOpaque(true);
+		invalidLines.setBackground(Color.WHITE);
+		invalidLines.setBorderPainted(false);
+		
 		exit = new JButton("Exit");
 		exit.setOpaque(true);
 		exit.setBackground(Color.WHITE);
@@ -55,20 +61,25 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		
 		home.addActionListener(this);
 		files.addActionListener(this);
+		invalidLines.addActionListener(this);
 		exit.addActionListener(this);
 		
 		add(home);
 		add(files);
+		add(invalidLines);
 		add(exit);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == home) {
-			this.notifyObservers("home");
+			this.notifyObservers("Home");
 		}
 		if(e.getSource() == files) {
-			this.notifyObservers("files");
+			this.notifyObservers("Files");
+		}
+		if(e.getSource() == invalidLines) {
+			this.notifyObservers("InvalidLines");
 		}
 		if(e.getSource() == exit) {
 			System.exit(0);

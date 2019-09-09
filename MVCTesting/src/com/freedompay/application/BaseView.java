@@ -1,11 +1,7 @@
 package com.freedompay.application;
 import com.freedompay.views.View;
-import com.freedompay.components.MainMenu;
 import com.freedompay.services.IRouteListener;
-
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
-
 import javax.swing.*;
 
 public class BaseView extends JFrame implements IRouteListener {
@@ -20,13 +16,13 @@ public class BaseView extends JFrame implements IRouteListener {
 	}
 	
 	public void createAndShowGUI(int w, int h) {
-		this.setLayout(new GridBagLayout());
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setTitle("MGries Java MVC Framework");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setPreferredSize(new Dimension(w, h));
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		
 		menu.build();
+		
 		this.setJMenuBar(menu);
 		
 		this.pack();
