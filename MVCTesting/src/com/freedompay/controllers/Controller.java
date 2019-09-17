@@ -42,7 +42,7 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JButton getClearCellBtn() {return null;}
 	
-	public JButton getRemoveBtn() {return null;}
+	public JButton getDeleteFileBtn() {return null;}
 	
 	public JButton getFileLineValidateBtn() {return null;}
 	
@@ -64,11 +64,11 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JPanel getPOSColumnList() {return null;}
 
-	public JPanel getAuthColumnList() {return null;}
+	public JPanel getAuthHeaderList() {return null;}
 	
-	public JPanel getBatchedColumnList() {return null;}
+	public JPanel getBatchedHeaderList() {return null;}
 	
-	public JScrollPane getMatchedColumnsTable() {return null;}
+	public JScrollPane getMatchedHeadersTable() {return null;}
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}

@@ -29,11 +29,13 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+//TODO: The Files are loading and deleting.
+// Set up the match table and Auth and Batched header lists
+
 
 public class FileController extends Controller  {
 
 	private View view;
-	
 	
 	// ------------ OBSERVER METHODS ----------------------------
 	
@@ -80,8 +82,8 @@ public class FileController extends Controller  {
 	private JButton posBtn;
 	private JButton authBtn;
 	private JButton batchedBtn;
+	private JButton deleteFileBtn;
 	private JButton clearBtn;
-	private JButton removeBtn;
 	private JButton fileLineValidateBtn;
 	
 	//When a file is picked..., 
@@ -110,18 +112,18 @@ public class FileController extends Controller  {
 		return this.batchedBtn;
 	}
 	
+	// Deletes the highlighted file in the file list display from the program
+	public JButton getDeleteFileBtn() {
+		this.deleteFileBtn = new JButton("Delete Selected File");
+		this.deleteFileBtn.addActionListener(this);
+		return this.deleteFileBtn;
+	}
+	
 	// Clears the value from the selected cell in the Matched Columns Table
 	public JButton getClearCellBtn() {
 		this.clearBtn = new JButton("Clear Selected Cell");
 		this.clearBtn.addActionListener(this);
 		return this.clearBtn;
-	}
-	
-	// Deletes the highlighted file in the file list display from the program
-	public JButton getRemoveBtn() {
-		this.removeBtn = new JButton("Delete Selected File");
-		this.removeBtn.addActionListener(this);
-		return this.removeBtn;
 	}
 	
 	// Updates the current view to the Invalid Lines View.
@@ -136,44 +138,53 @@ public class FileController extends Controller  {
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == posBtn) {
-			if(FileData.getFileCount() < 3) {
-				this.openFileChooser(FileType.POS);
-			}
+			this.openFileChooser(FileType.POS);
 		}
 		if(e.getSource() == authBtn) {
-			if(Validation.validateFileUpload(FileType.UNCAPTURED_AUTH)) {
-				this.openFileChooser(FileType.UNCAPTURED_AUTH);
-			}
+			this.openFileChooser(FileType.UNCAPTURED_AUTH);
 		}
 		if(e.getSource() == batchedBtn) {
-			if(Validation.validateFileUpload(FileType.CAPTURED)) {
-				this.openFileChooser(FileType.CAPTURED);
-			}
+			this.openFileChooser(FileType.CAPTURED);
+		}
+		if(e.getSource() == deleteFileBtn) {
+			this.deleteSelectedFile();
 		}
 		if(e.getSource() == clearBtn) {
-			int row = this.matchedColumnsTable.getSelectedRow();
-			int col = this.matchedColumnsTable.getSelectedColumn();
+			int row = this.matchedHeadersTable.getSelectedRow();
+			int col = this.matchedHeadersTable.getSelectedColumn();
 			if(col > 0 && row >= 0) {
 				ColumnData.clearCell(row, col);
 			}
 		}
 		if(e.getSource() == fileLineValidateBtn) {
-			if(FileData.getAllFiles().size() > 1  ){
-				InvalidLinesData.setInvalidLinesData();
-				for(FileModel model : FileData.getAllFiles()) {
-					//model.validateFileRows();
-					
-//					if(!model.getIsValidated()) {
-//						model.validateFileRows();
-//						model.setIsValidated();
-//					}
+			if(FileData.getAllFileModels().size() > 1 && FileData.getIsPOSLoadedFlag()){
+				List<FileModel> models = FileData.getAllFileModels();
+				for(FileModel model : models) {
+					if(model.getFileType() == FileType.POS) {
+						model.getFileContents().setSelectedColumnIndexes(ColumnData.getTableData());
+					}else {
+						model.getFileContents().setSelectedColumnIndexes();
+					}
 				}
 				this.notifyObservers("InvalidLines");
 			}
 		}
-		if(e.getSource() == removeBtn) {
-			this.deleteSelectedItem();
+	}
+	
+	private boolean confirmValidationIsReady() {
+		boolean authLoaded = ComponentData.getAuthBtnIsEnabled();
+		boolean batchedLoaded = ComponentData.getBatchedBtnIsEnabled();
+		if((authLoaded || batchedLoaded)) {
+			for(FileModel model : FileData.getAllFileModels()) {
+				if(model.getFileType() == FileType.POS) {
+					model.getFileContents().setSelectedColumnIndexes(ColumnData.getTableData());
+				}else {
+					model.getFileContents().setSelectedColumnIndexes();
+				}
+			}
 		}
+		// TODO: VERIFY THAT THE COLUMNS FOR THE TWO NON POS FILES ARE NOT ALL NULL
+		return false;
 	}
 	
 	// --------------- BUTTON STATE TOGGLE ---------------------
@@ -208,9 +219,9 @@ public class FileController extends Controller  {
 				File f = fc.getSelectedFile();
 				if(Validation.isModelValid(f, type)) {
 					FileData.saveModel(new FileModel(f, type));
-					this.updateFileNameList();
 					this.updateColumnSelections(type);
 					this.setButtonEnabled(type);
+					this.loadFileNames();
 				}
 			}
 		}catch(Exception ex) {
@@ -218,60 +229,40 @@ public class FileController extends Controller  {
 		}
 	}
 	
-	// Add a new file to the list
-	private void updateFileNameList(){
-		this.clearFileList();
-		this.loadFileNames();
-	}
-	
-//===========================================================================
-
-		// REMOVING A FILE FROM THE PROGRAM
-
-//===========================================================================
-	
 	// Remove selected file on Delete action
-	private void deleteSelectedItem() {
+	private void deleteSelectedFile() {
 		String sel = this.displayFileNames.getSelectedValue();
 		if(sel != null) {
-			FileModel model = FileData.getFile(sel);
+			FileModel model = FileData.getFileModel(sel);
 			FileType type = model.getFileType();
+			FileData.deleteModel(type);
 			this.setButtonEnabled(type);
-			this.clearFileList();
-			this.clearColumns(type);
-			FileData.deleteModel(model);
 			this.loadFileNames();
+			ColumnData.clearMatchedCells(type);
+			ColumnData.clearMatchedIndexes(type);
 		}
 	}
 	
-	private void clearFileList() {
-		this.displayFileNames.clearSelection();
-		this.fileNamesListModel.clear();
-	}
+	// --------------- FILE COLUMN LIST CONTROLS -------------------
 	
-	private void clearColumns(FileType type) {
+	private void updateColumnSelections(FileType type) {
 		switch(type) {
 			case POS:
-				this.matchedColumnsTable.clearSelection();
-				ColumnData.getTableData().setRowCount(0);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearAllSelectedLinesColumns();
-				FileData.setIsPOSLoadedFlag();
-				this.selectedRow = -1;
+				this.setPOSHeadersToTable();
+				ColumnData.setPosHeadersSize(FileData.getFileModel(type).getFileContents().getColumnCount());
+				ColumnData.setMatchedIndexes();
 				break;
 			case UNCAPTURED_AUTH:
-				this.authColumnList.clearSelection();
-				this.authColumnModel.clear();
-				ColumnData.clearMatchedCells(type);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearAuthSelectedColumns();
+				this.loadAuthHeaders();
+				if(FileData.getIsPOSLoadedFlag()) {
+					ColumnData.setMatchedOnAuth();
+				}
 				break;
 			case CAPTURED:
-				this.batchedColumnList.clearSelection();
-				this.batchedColumnModel.clear();
-				ColumnData.clearMatchedCells(type);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearBatchedSelectedColumns();
+				this.loadBatchedHeaders();
+				if(FileData.getIsPOSLoadedFlag()) {
+					
+				}
 				break;
 		}
 	}
@@ -301,7 +292,8 @@ public class FileController extends Controller  {
 		
 	// Load existing files when navigating back to the page
 	private DefaultListModel<String> loadFileNames(){
-		Iterator<FileModel> i = FileData.getAllFiles().iterator();
+		this.fileNamesListModel.clear();
+		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
 		while(i.hasNext()) {
 			this.fileNamesListModel.addElement((String)i.next().getName());
 		}
@@ -316,138 +308,94 @@ public class FileController extends Controller  {
 	
 	// -------------- UNCAPTURED AUTHORIZATION FILES ----------------
 	
-	private DefaultListModel<String> authColumnModel = new DefaultListModel<String>();
-	private JList<String> authColumnList;
-	private JScrollPane authColumnListContainer;
+	private DefaultListModel<String> authHeaderModel = new DefaultListModel<String>();
+	private JList<String> authHeaderList;
+	private JScrollPane authHeaderListContainer;
 	
-	public JPanel getAuthColumnList() {
+	public JPanel getAuthHeaderList() {
 		JPanel p = new JPanel();
-		JLabel l = new JLabel("Uncaptured Auth Columns");
+		JLabel l = new JLabel("Uncaptured Auth Headers");
 		
 		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		p.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
 		// Should take a load method instead of directly assigning the model
-		this.authColumnList = new JList<String>(this.loadAuthColumns());
-		this.authColumnList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.authColumnList.addListSelectionListener(this);
-		this.authColumnList.setVisibleRowCount(6);
-		this.authColumnListContainer = new JScrollPane(this.authColumnList);
+		this.authHeaderList = new JList<String>(this.loadAuthHeaders());
+		this.authHeaderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.authHeaderList.addListSelectionListener(this);
+		this.authHeaderList.setVisibleRowCount(6);
+		this.authHeaderListContainer = new JScrollPane(this.authHeaderList);
 		
 		Border bevel = BorderFactory.createLoweredBevelBorder();
-		this.authColumnListContainer.setBorder(bevel);
+		this.authHeaderListContainer.setBorder(bevel);
 		
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.authColumnListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.authHeaderListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		p.add(l);
-		p.add(this.authColumnListContainer);
+		p.add(this.authHeaderListContainer);
 		
 		return p;
 	}
 	
-	private DefaultListModel<String> loadAuthColumns(){
-		if(FileData.getFile(FileType.UNCAPTURED_AUTH) != null) {
-			Iterator<String> i = FileData.getFile(FileType.UNCAPTURED_AUTH).getHeaderNames().iterator();
-			while(i.hasNext()) {
-				this.authColumnModel.addElement(i.next());
+	private DefaultListModel<String> loadAuthHeaders(){
+		if(FileData.getFileModel(FileType.UNCAPTURED_AUTH) != null) {
+			FileModel model = FileData.getFileModel(FileType.UNCAPTURED_AUTH);
+			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
+			while(headers.hasNext()) {
+				this.authHeaderModel.addElement(headers.next());
 			}
+		}else {
+			this.authHeaderModel.clear();
 		}
-		return this.authColumnModel;
+		return this.authHeaderModel;
 	}
 	
 	// --------------- BATCHED TRANS COLUMN LIST -------------------
 	
-	private DefaultListModel<String> batchedColumnModel = new DefaultListModel<String>();
-	private JList<String> batchedColumnList;
-	private JScrollPane batchedColumnListContainer;
+	private DefaultListModel<String> batchedHeaderModel = new DefaultListModel<String>();
+	private JList<String> batchedHeaderList;
+	private JScrollPane batchedHeaderListContainer;
 	
-	public JPanel getBatchedColumnList() {
+	public JPanel getBatchedHeaderList() {
 		JPanel p = new JPanel();
-		JLabel l = new JLabel("Batched Trans Columns");
+		JLabel l = new JLabel("Batched Trans Headers");
 		
 		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		
-		this.batchedColumnList = new JList<String>(this.loadBatchedColumns());
-		this.batchedColumnList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.batchedColumnList.addListSelectionListener(this);
-		this.batchedColumnList.setVisibleRowCount(6);
-		this.batchedColumnListContainer = new JScrollPane(this.batchedColumnList);
+		this.batchedHeaderList = new JList<String>(this.loadBatchedHeaders());
+		this.batchedHeaderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.batchedHeaderList.addListSelectionListener(this);
+		this.batchedHeaderList.setVisibleRowCount(6);
+		this.batchedHeaderListContainer = new JScrollPane(this.batchedHeaderList);
 
 		p.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
 		Border bevel = BorderFactory.createLoweredBevelBorder();
-		this.batchedColumnListContainer.setBorder(bevel);
+		this.batchedHeaderListContainer.setBorder(bevel);
 		
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.batchedColumnListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.batchedHeaderListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		p.add(Box.createRigidArea(new Dimension(10, 0)));
 		p.add(l);
 		p.add(Box.createRigidArea(new Dimension(10, 0)));
-		p.add(this.batchedColumnListContainer);
+		p.add(this.batchedHeaderListContainer);
 		
 		return p;
 	}
 	
-	private DefaultListModel<String> loadBatchedColumns(){
-		if(FileData.getFile(FileType.CAPTURED) != null) {
-			Iterator<String> i = FileData.getFile(FileType.CAPTURED).getHeaderNames().iterator();
-			while(i.hasNext()) {
-				this.batchedColumnModel.addElement(i.next());
+	private DefaultListModel<String> loadBatchedHeaders(){
+		if(FileData.getFileModel(FileType.CAPTURED) != null) {
+			FileModel model = FileData.getFileModel(FileType.CAPTURED);
+			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
+			while(headers.hasNext()) {
+				this.batchedHeaderModel.addElement(headers.next());
 			}
+		}else {
+			this.batchedHeaderModel.clear();
 		}
-		return this.batchedColumnModel;
-	}
-	
-	// --------------- FILE COLUMN LIST CONTROLS -------------------
-	
-	private void updateColumnSelections(FileType type) {
-		switch(type) {
-			case POS:
-				this.setPOSColumnsToTable();
-				ColumnData.setPosHeadersSize(FileData.getFile(type).getColumnCount());
-				ColumnData.setMatchedIndexes();
-				break;
-			case UNCAPTURED_AUTH:
-				this.loadAuthColumns();
-				if(FileData.getIsPOSLoadedFlag()) {
-					ColumnData.setMatchedOnAuth();
-				}
-				break;
-			case CAPTURED:
-				this.loadBatchedColumns();
-				if(FileData.getIsPOSLoadedFlag()) {
-					ColumnData.setMatchedOnBatched();
-				}
-				break;
-		}
-	}
-	
-	public void valueChanged(ListSelectionEvent le) {
-		if(!le.getValueIsAdjusting() && this.selectedRow > -1) {
-			@SuppressWarnings("unchecked")
-			JList<String> list = (JList<String>) le.getSource();
-			String value = "";
-			int index = -1;
-			
-			if(le.getSource() == authColumnList) {
-				value = (String) list.getSelectedValue();
-				index = (int) list.getSelectedIndex();
-				this.updateMatchedColumnModel(value, FileType.UNCAPTURED_AUTH, index);	
-			}
-			if(le.getSource() == batchedColumnList) {
-				value = (String) list.getSelectedValue();
-				index = (int) list.getSelectedIndex();
-				this.updateMatchedColumnModel(value, FileType.CAPTURED, index);
-			}
-		}
-	}
-		
-	@Override
-	public void mousePressed(MouseEvent e) {
-		JTable table = (JTable) e.getSource();
-		this.selectedRow = table.getSelectedRow();
+		return this.batchedHeaderModel;
 	}
 
 //===========================================================================
@@ -456,38 +404,34 @@ public class FileController extends Controller  {
 
 //===========================================================================
 
-	private JTable matchedColumnsTable = null;
-	private JScrollPane matchedColumnsScrollPane;
+	private JTable matchedHeadersTable = null;
+	private JScrollPane matchedHeadersScrollPane;
 	private int selectedRow = -1;
 	
-	public JScrollPane getMatchedColumnsTable() {
-		this.matchedColumnsTable = new JTable(this.loadMatchedColumnTableModel());
-		this.matchedColumnsTable.addMouseListener(this);
-		this.matchedColumnsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.matchedColumnsScrollPane = new JScrollPane(this.matchedColumnsTable);
-		return this.matchedColumnsScrollPane;
+	public JScrollPane getMatchedHeadersTable() {
+		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
+		this.matchedHeadersTable.addMouseListener(this);
+		this.matchedHeadersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.matchedHeadersScrollPane = new JScrollPane(this.matchedHeadersTable);
+		return this.matchedHeadersScrollPane;
 	}
 	
-	private DefaultTableModel loadMatchedColumnTableModel() {
-		if(!ColumnData.getPOSHeadersSetFlag()) {
-			this.setHeadersToMatchTable();
-		}
+	private DefaultTableModel loadMatchedHeadersTableModel() {
 		return ColumnData.getTableData();
 	}
-	
-	private void setHeadersToMatchTable() {
-		for(String header : ColumnData.getMatchedTableHeaders()) {
-			ColumnData.getTableData().addColumn(header);
-		}
-		ColumnData.setPOSHeadersSetFlag();
-	}
-	
-	private void setPOSColumnsToTable() {
+
+	private void setPOSHeadersToTable() {
 		this.selectedRow = -1;
-		ColumnData.setPOSColumnsToTableData(FileData.getFile(FileType.POS).getHeaderNames());
+		if(FileData.getFileModel(FileType.POS) != null) {
+			FileModel posModel = FileData.getFileModel(FileType.POS);
+			ColumnData.setPOSHeadersToTableData(posModel.getFileContents().getHeaderNames());
+		}else {
+			ColumnData.getTableData().setRowCount(0);
+		}
+		
 	}
 	
-	private void updateMatchedColumnModel(String txt, FileType type, int colIndex) {
+	private void updateMatchedHeaderModel(String txt, FileType type, int colIndex) {
 		int column = -1;
 		switch(type) {
 		case UNCAPTURED_AUTH:
@@ -502,5 +446,31 @@ public class FileController extends Controller  {
 		}
 		ColumnData.updateTableData(txt, selectedRow, column);
 		ColumnData.updateMatchedIndexes(type, selectedRow, colIndex);
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		JTable table = (JTable) e.getSource();
+		this.selectedRow = table.getSelectedRow();
+	}
+	
+	public void valueChanged(ListSelectionEvent le) {
+		if(!le.getValueIsAdjusting() && this.selectedRow > -1) {
+			@SuppressWarnings("unchecked")
+			JList<String> list = (JList<String>) le.getSource();
+			String value = "";
+			int index = -1;
+			
+			if(le.getSource() == authHeaderList) {
+				value = (String) list.getSelectedValue();
+				index = (int) list.getSelectedIndex();
+				this.updateMatchedHeaderModel(value, FileType.UNCAPTURED_AUTH, index);	
+			}
+			if(le.getSource() == batchedHeaderList) {
+				value = (String) list.getSelectedValue();
+				index = (int) list.getSelectedIndex();
+				this.updateMatchedHeaderModel(value, FileType.CAPTURED, index);
+			}
+		}
 	}
 }

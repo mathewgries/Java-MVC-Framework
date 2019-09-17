@@ -85,7 +85,7 @@ public class InvalidLinesView extends View {
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
 		JLabel columnLabel = this.controller.getJLabel("Matched Columns");
 		JScrollPane fileListScrollPane = this.controller.getFileNameList();
-		JScrollPane matchedColumnsScrollPane = this.controller.getMatchedColumnsTable();
+		JScrollPane matchedColumnsScrollPane = this.controller.getMatchedHeadersTable();
 		
 		scene.setLayout(new BoxLayout(scene, BoxLayout.PAGE_AXIS));
 		fileLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

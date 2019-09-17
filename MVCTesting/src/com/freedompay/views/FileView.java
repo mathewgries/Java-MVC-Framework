@@ -79,7 +79,7 @@ public class FileView extends View {
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
 		JLabel columnLabel = this.controller.getJLabel("Matched Columns");
 		JScrollPane fileListScrollPane = this.controller.getFileNameList();
-		JScrollPane matchedColumnsScrollPane = this.controller.getMatchedColumnsTable();
+		JScrollPane matchedColumnsScrollPane = this.controller.getMatchedHeadersTable();
 		
 		scene.setLayout(new BoxLayout(scene, BoxLayout.PAGE_AXIS));
 		fileLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -101,15 +101,15 @@ public class FileView extends View {
 		JButton posBtn = this.controller.getPOSBtn();
 		JButton authBtn = this.controller.getAuthBtn();
 		JButton batchedBtn = this.controller.getBatchedBtn();
+		JButton deleteFileBtn = this.controller.getDeleteFileBtn();
 		JButton clearBtn = this.controller.getClearCellBtn();
-		JButton removeBtn = this.controller.getRemoveBtn();
 		JButton checkErrorsBtn = this.controller.getFileLineValidateBtn();
 	
 		p.add(posBtn);
 		p.add(authBtn);
 		p.add(batchedBtn);
+		p.add(deleteFileBtn);
 		p.add(clearBtn);
-		p.add(removeBtn);
 		p.add(checkErrorsBtn);
 		
 		return p;
@@ -143,8 +143,8 @@ public class FileView extends View {
 	
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JPanel auth = this.controller.getAuthColumnList();
-		JPanel batched = this.controller.getBatchedColumnList();
+		JPanel auth = this.controller.getAuthHeaderList();
+		JPanel batched = this.controller.getBatchedHeaderList();
 		
 		story.setLayout(new BoxLayout(story, BoxLayout.LINE_AXIS));
 

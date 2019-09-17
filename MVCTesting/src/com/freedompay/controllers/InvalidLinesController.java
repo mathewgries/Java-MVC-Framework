@@ -20,6 +20,7 @@ import com.freedompay.data.FileData;
 import com.freedompay.models.FileModel;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.util.ErrorType;
+import com.freedompay.util.FileType;
 import com.freedompay.views.View;
 
 public class InvalidLinesController extends Controller implements ListSelectionListener, ActionListener {
@@ -91,7 +92,7 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	private JScrollPane fileNameListContainer;
 	
 	
-	// Display uploaded file names
+	// Display uploaded file names in a JList
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
 		this.displayFileNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,38 +101,42 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		this.fileNameListContainer = new JScrollPane(this.displayFileNames);
 		return this.fileNameListContainer;
 	}
-	
+		
 	// Load existing files when navigating back to the page
 	private DefaultListModel<String> loadFileNames(){
-		Iterator<FileModel> i = FileData.getAllFiles().iterator();
+		this.fileNamesListModel.clear();
+		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
 		while(i.hasNext()) {
-			this.fileNamesListModel.addElement((String)i.next().getName());
+			if(i.next().getFileContents().getSelectedColumnIndexes() != null) {
+				this.fileNamesListModel.addElement((String)i.next().getName());
+			}
 		}
 		return this.fileNamesListModel;
 	}
 	
-	private JTable matchedColumnsTable = null;
-	private JScrollPane matchedColumnsScrollPane;
+	private JTable matchedHeadersTable = null;
+	private JScrollPane matchedHeadersScrollPane;
 	
-	public JScrollPane getMatchedColumnsTable() {
-		this.matchedColumnsTable = new JTable(this.loadMatchedColumnTableModel());
-		this.matchedColumnsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.matchedColumnsScrollPane = new JScrollPane(this.matchedColumnsTable);
-		return this.matchedColumnsScrollPane;
+	public JScrollPane getMatchedHeadersTable() {
+		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
+		this.matchedHeadersTable.addMouseListener(this);
+		this.matchedHeadersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.matchedHeadersScrollPane = new JScrollPane(this.matchedHeadersTable);
+		return this.matchedHeadersScrollPane;
 	}
 	
-	private DefaultTableModel loadMatchedColumnTableModel() {
-		if(!ColumnData.getPOSHeadersSetFlag()) {
-			this.setHeadersToMatchTable();
-		}
+	private DefaultTableModel loadMatchedHeadersTableModel() {
 		return ColumnData.getTableData();
 	}
-	
-	private void setHeadersToMatchTable() {
-		for(String header : ColumnData.getMatchedTableHeaders()) {
-			ColumnData.getTableData().addColumn(header);
+
+	private void setPOSHeadersToTable() {
+		if(FileData.getFileModel(FileType.POS) != null) {
+			FileModel posModel = FileData.getFileModel(FileType.POS);
+			ColumnData.setPOSHeadersToTableData(posModel.getFileContents().getHeaderNames());
+		}else {
+			ColumnData.getTableData().setRowCount(0);
 		}
-		ColumnData.setPOSHeadersSetFlag();
+		
 	}
 	
 //===========================================================================
@@ -168,11 +173,11 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	}
 	
 	private void updateInvalidModel(String filename) {
-		FileModel model = FileData.getFile(filename);
+		FileModel model = FileData.getFileModel(filename);
 		this.invalidModel.setColumnCount(0);
 		this.invalidModel.setRowCount(0);
-		this.errorIntegers = model.getInvalidRowIndexesWithEnumInts();
-	    this.setTableHeaders(model.getHeaderNames());
+		//this.errorIntegers = model.getInvalidRowIndexesWithEnumInts();
+	    //this.setTableHeaders(model.getHeaderNames());
 	    if(filename != null) {
 	        for(ArrayList<Integer> line : errorIntegers) {
 	        	if(line.size() > 1) {
@@ -193,8 +198,8 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	}
 	
 	private Object[] printErrorLineToArray(FileModel model, ArrayList<Integer> line) {
-		String[] results = new String[model.getColumnCount() + 3];
-		List<ArrayList<String>> lines = model.getFileRows();
+		String[] results = new String[model.getFileContents().getColumnCount() + 3];
+		List<ArrayList<String>> lines = model.getFileContents().getFileRows();
 		results[0] = Integer.toString(line.get(0)); 
 		results[1] = Integer.toString(line.size() - 1); 
 		results[2] = "";
@@ -203,7 +208,7 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 			results[2] += this.setErrorsFromEnum(line.get(i));
 		}
 		
-		for(int i = 0; i < model.getColumnCount();i++) {
+		for(int i = 0; i < model.getFileContents().getColumnCount();i++) {
 			results[i + 3] = lines.get(line.get(0)).get(i);
 		}
 		return results;

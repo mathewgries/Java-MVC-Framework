@@ -4,10 +4,11 @@ import com.freedompay.models.FileModel;
 import com.freedompay.util.FileType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class FileData {
-	private static List<FileModel> files = new ArrayList<FileModel>();
+	private static List<FileModel> fileModels = new ArrayList<FileModel>();
 	private static boolean isPOSLoaded = false;
 	
 	public static void setIsPOSLoadedFlag() {
@@ -18,57 +19,70 @@ public class FileData {
 		return FileData.isPOSLoaded;
 	}
 	
+	//======================= SAVE MODEL =========================
+	
 	public static void saveModel(FileModel f) {
 		if(f.getFileType() == FileType.POS) {
-			FileData.files.add(0, f);
+			FileData.fileModels.add(0, f);
 			FileData.setIsPOSLoadedFlag();
+		}else if(FileData.getAllFileModels().size() > 1 && f.getFileType() == FileType.UNCAPTURED_AUTH) {
+			FileData.fileModels.add(1, f);
 		}else {
-			FileData.files.add(f);
+			FileData.fileModels.add(f);
 		}
-
 	}
+	
+	//======================= DELETE MODEL =========================
 	
 	public static void deleteModel(String name) {
-		for(FileModel file : FileData.getAllFiles()) {
-			if(file.getName().equalsIgnoreCase(name)) {
-				FileData.files.remove(file);
-				break;
+		Iterator<FileModel> models = FileData.getAllFileModels().iterator();
+		while(models.hasNext()) {
+			if(models.next().getName().equalsIgnoreCase(name)) {
+				models.remove();
 			}
 		}
 	}
 	
-	public static void deleteModel(FileModel model) {
-		for(FileModel file : FileData.getAllFiles()) {
-			if(file.equals(model)) {
-				if(model.getFileType() == FileType.POS) {
-					FileData.setIsPOSLoadedFlag();
-				}
-				FileData.files.remove(model);
-				break;
+	public static void deleteModel(FileModel fm) {
+		Iterator<FileModel> models = FileData.getAllFileModels().iterator();
+		while(models.hasNext()) {
+			if(models.next().equals(fm)) {
+				models.remove();
 			}
 		}
 	}
 	
-	public static FileModel getFile(String name) {
-		for(FileModel file : FileData.files) {
-			if(file.getName().equalsIgnoreCase(name)) {
-				return file;
+	public static void deleteModel(FileType type) {
+		Iterator<FileModel> models = FileData.getAllFileModels().iterator();
+		while(models.hasNext()) {
+			if(models.next().getFileType() == type) {
+				models.remove();
+			}
+		}
+	}
+	
+	//======================= GET FILE MODEL =========================
+	
+	public static FileModel getFileModel(String name) {
+		for(FileModel model : FileData.fileModels) {
+			if(model.getName().equalsIgnoreCase(name)) {
+				return model;
 			}
 		}
 		return null;
 	}
 	
-	public static FileModel getFile(FileType type) {
-		for(FileModel file : FileData.files) {
-			if(file.getFileType() == type) {
-				return file;
+	public static FileModel getFileModel(FileType type) {
+		for(FileModel model : FileData.fileModels) {
+			if(model.getFileType() == type) {
+				return model;
 			}
 		}
 		return null;
 	}
 	
-	public static FileModel getFile(int id) {
-		for(FileModel model : FileData.files) {
+	public static FileModel getFileModel(int id) {
+		for(FileModel model : FileData.fileModels) {
 			if(model.getId() == id) {
 				return model;
 			}
@@ -76,11 +90,13 @@ public class FileData {
 		return null;
 	}
 	
-	public static List<FileModel> getAllFiles(){
-		return FileData.files;
+	//================ GET ALL FILE MODELS ===================
+	
+	public static List<FileModel> getAllFileModels(){
+		return FileData.fileModels;
 	}
 	
 	public static int getFileCount() {
-		return FileData.files.size();
+		return FileData.fileModels.size();
 	}
 }

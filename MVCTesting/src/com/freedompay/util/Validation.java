@@ -20,7 +20,7 @@ public class Validation {
 	private static List<String> loadHeadersForValidation(FileModel model) {
 		List<String> results = new ArrayList<String>();
 		List<Integer> colPos = null;
-		List<String> headers = model.getHeaderNames();
+		List<String> headers = model.getFileContents().getHeaderNames();
 		
 		switch(model.getFileType()) {
 		case POS:
@@ -40,7 +40,6 @@ public class Validation {
 	}
 	
 	private static List<String> getFileSelectedHeaders(FileModel model, List<Integer> colPos, List<String> headers){
-		System.out.println("Getting Header");
 		List<String> results = new ArrayList<String>();
 		for(int i = 0; i < headers.size(); i++) {
 			for(int j = 0; j < colPos.size(); j++) {
@@ -48,10 +47,6 @@ public class Validation {
 					results.add(headers.get(i));
 				}
 			}
-		}
-		System.out.println("Printing Headers");
-		for(String result : results) {
-			System.out.print(result + ", ");
 		}
 		return results;
 	}
@@ -61,7 +56,7 @@ public class Validation {
 	private static List<ArrayList<String>> loadColumnsForValidation(FileModel model) {
 		System.out.println("Loading Columns For Validation");
 		List<ArrayList<String>> lines = new ArrayList<ArrayList<String>>();
-		List<ArrayList<String>> filelines = model.getFileRows();
+		List<ArrayList<String>> filelines = model.getFileContents().getFileRows();
 		List<Integer> indexes = null;
 		
 		switch(model.getFileType()) {
@@ -86,16 +81,6 @@ public class Validation {
 			}
 		}
 		return lines;
-	}
-	
-	
-	
-	public static boolean validateFileUpload(FileType type) {
-		for(FileModel model : FileData.getAllFiles()) {
-			if(model.getFileType() == type) {return false;}
-		}
-		if(FileData.getFileCount() == 3) { return false; }
-		return true;
 	}
 	
 	public static boolean isModelValid(File model, FileType type) {
@@ -136,7 +121,7 @@ public class Validation {
 	public static boolean validateFileNotUploaded(File model) {
 		try {
 			for(int i = 0; i < FileData.getFileCount(); i++) {
-				if(FileData.getAllFiles().get(i).getFile().equals(model)) {
+				if(FileData.getAllFileModels().get(i).getFile().equals(model)) {
 					return false;
 				}
 			}
@@ -207,22 +192,22 @@ public class Validation {
 		 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
 		 */
 	public static void validateLast4Value(FileModel model, List<ArrayList<String>> lines, List<String> headers) {
-		int errorType = ErrorType.INVALID_PAN.getValue();
-		int panPos = Validation.getPanPos(headers);
-		if(panPos >= 0) {
-			try {
-				for(int i = 1; i < lines.size(); i++) {
-					for(int j = 0; j < lines.get(i).size(); j++) {
-						if(j == panPos && lines.get(i).get(j).length() != 4){
-							model.updateInvalidList().get(i).add(errorType);
-							break;
-						}
-					}
-				}
-			}catch(ArrayIndexOutOfBoundsException ex) {
-				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
-			}
-		}
+//		int errorType = ErrorType.INVALID_PAN.getValue();
+//		int panPos = Validation.getPanPos(headers);
+//		if(panPos >= 0) {
+//			try {
+//				for(int i = 1; i < lines.size(); i++) {
+//					for(int j = 0; j < lines.get(i).size(); j++) {
+//						if(j == panPos && lines.get(i).get(j).length() != 4){
+//							model.updateInvalidList().get(i).add(errorType);
+//							break;
+//						}
+//					}
+//				}
+//			}catch(ArrayIndexOutOfBoundsException ex) {
+//				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+//			}
+//		}
 	}
 		
 		// Get last 4 header index
@@ -259,27 +244,27 @@ public class Validation {
 	 * @param linesWithErrors ArrayList String[] List to add the invalid lines to
 	 */
 	public static void validateDollarAmountIsNumeric(FileModel model, List<ArrayList<String>> lines, List<String> headers) {
-		int errorType = ErrorType.NON_NUMERIC.getValue();
-		ArrayList<Integer> pos = getDollarColumnPostion(headers);
-		if(pos.size() != 0) {
-			Validation.removeDollarSign(pos, lines);
-			try {
-				for(int i = 1; i < lines.size(); i++) {
-					for(int j = 0; j < lines.get(i).size(); j++) {
-						for(int k = 0; k < pos.size(); k++) {
-							if(j == pos.get(k)){
-								if(!isNumeric( lines.get(i).get(j))) {
-									model.getInvalidRowIndexesWithEnumInts().get(i).add(errorType);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}catch(ArrayIndexOutOfBoundsException ex) {
-				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
-			}
-		}
+//		int errorType = ErrorType.NON_NUMERIC.getValue();
+//		ArrayList<Integer> pos = getDollarColumnPostion(headers);
+//		if(pos.size() != 0) {
+//			Validation.removeDollarSign(pos, lines);
+//			try {
+//				for(int i = 1; i < lines.size(); i++) {
+//					for(int j = 0; j < lines.get(i).size(); j++) {
+//						for(int k = 0; k < pos.size(); k++) {
+//							if(j == pos.get(k)){
+//								if(!isNumeric( lines.get(i).get(j))) {
+//									model.getInvalidRowIndexesWithEnumInts().get(i).add(errorType);
+//									break;
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}catch(ArrayIndexOutOfBoundsException ex) {
+//				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+//			}
+//		}
 	}
 	
 	/**
