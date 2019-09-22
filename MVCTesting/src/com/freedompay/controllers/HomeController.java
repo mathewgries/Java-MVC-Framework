@@ -1,21 +1,15 @@
 package com.freedompay.controllers;
-
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import com.freedompay.configuration.Configure;
-
-
+/**
+ * <p>
+ * Controller for the HomeView class
+ * </p>
+ * @author MGries
+ *
+ */
 public class HomeController extends Controller {
-	
-	//private Image banner;
-	//private Image scaled;
 	
 	//--------------- PAGE INSTRUCTIONS ---------------------
 	
@@ -45,7 +39,6 @@ public class HomeController extends Controller {
 		return t;
 	}
 
-	
 	public JLabel getJLabel(String txt) {
 		return new JLabel(txt);
 	}

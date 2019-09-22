@@ -6,6 +6,14 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
+/**
+ * <p>
+ * Basic application configurations.
+ * Gets the Viewport dimensions from the system
+ * </p>
+ * @author MGries
+ *
+ */
 public class Configure {
 	
 	private static int viewWidth;
@@ -24,6 +32,13 @@ public class Configure {
 		return viewHeight;	
 	}
 	
+	/**
+	 * <p>
+	 * The system Viewport dimensions. The dimensions set here
+	 * are assigned to the BaseView for Fullscreen.
+	 * </p>
+	 * @return
+	 */
 	public static Rectangle getScreenViewableBounds() {
 
 	    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();

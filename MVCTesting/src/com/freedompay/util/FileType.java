@@ -3,6 +3,14 @@ package com.freedompay.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <p>
+ * Enum for the different file types to keep track of
+ * which file is which when making selections in the app
+ * </p>
+ * @author MGries
+ *
+ */
 public enum FileType {
 	POS(1),
 	UNCAPTURED_AUTH(2),

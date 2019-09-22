@@ -29,11 +29,16 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
+/**
+ * <p>
+ * The controller for the FileView class.
+ * </p>
+ * @author MGries
+ *
+ */
 public class FileController extends Controller  {
 
 	private View view;
-	
 	
 	// ------------ OBSERVER METHODS ----------------------------
 	
@@ -69,24 +74,26 @@ public class FileController extends Controller  {
 		return new JLabel(txt);
 	}
 	
-//===========================================================================
+//==========================================================================================================
 	
-			//DECISION PANEL DISPLAY - Action Buttons
+							//DECISION PANEL DISPLAY - Action Buttons
 	
-//===========================================================================
+//==========================================================================================================
 	
 	//-------------- ADD and REMOVE FILES BUTTONS ----------------
 	
 	private JButton posBtn;
 	private JButton authBtn;
 	private JButton batchedBtn;
+	private JButton deleteFileBtn;
 	private JButton clearBtn;
-	private JButton removeBtn;
-	private JButton fileLineValidateBtn;
+	private JButton invalidRowsBtn;
 	
 	//When a file is picked..., 
 	
-	// ...the file type is set to POS
+	/**
+	 * <p>Load POS add button to View</p>
+	 */
 	public JButton getPOSBtn() {
 		this.posBtn = new JButton("POS File");
 		this.posBtn.addActionListener(this);
@@ -94,7 +101,9 @@ public class FileController extends Controller  {
 		return this.posBtn;
 	}
 	
-	// ...the file type is set to UNCAPTURED_AUTH
+	/**
+	 * <p>Load uncapturedAuth button to view</p>
+	 */
 	public JButton getAuthBtn() {
 		this.authBtn = new JButton("UnCaptured Auth File");
 		this.authBtn.addActionListener(this);
@@ -102,7 +111,9 @@ public class FileController extends Controller  {
 		return this.authBtn; 
 	}
 	
-	// ...the file type is set to CAPTURED
+	/**
+	 * <p>Load Captured button to View</p>
+	 */
 	public JButton getBatchedBtn() {
 		this.batchedBtn = new JButton("Captured File");
 		this.batchedBtn.addActionListener(this);
@@ -110,76 +121,85 @@ public class FileController extends Controller  {
 		return this.batchedBtn;
 	}
 	
-	// Clears the value from the selected cell in the Matched Columns Table
+	/**
+	 * <p>Load file delete button to View</p>
+	 */
+	public JButton getDeleteFileBtn() {
+		this.deleteFileBtn = new JButton("Delete Selected File");
+		this.deleteFileBtn.addActionListener(this);
+		return this.deleteFileBtn;
+	}
+	
+	/**
+	 * <p>Load Clear Cell button to View</p>
+	 */
 	public JButton getClearCellBtn() {
 		this.clearBtn = new JButton("Clear Selected Cell");
 		this.clearBtn.addActionListener(this);
 		return this.clearBtn;
 	}
 	
-	// Deletes the highlighted file in the file list display from the program
-	public JButton getRemoveBtn() {
-		this.removeBtn = new JButton("Delete Selected File");
-		this.removeBtn.addActionListener(this);
-		return this.removeBtn;
-	}
-	
-	// Updates the current view to the Invalid Lines View.
-	// Begins validation on selected columns
-	public JButton getFileLineValidateBtn() {
-		this.fileLineValidateBtn = new JButton("Check Files For Errors");
-		this.fileLineValidateBtn.addActionListener(this);
-		return this.fileLineValidateBtn;
+	/**
+	 * <p>Load File Validation Button to View</p>
+	 */
+	public JButton getInvalidRowsBtn() {
+		this.invalidRowsBtn = new JButton("Invalid Rows");
+		this.invalidRowsBtn.addActionListener(this);
+		return this.invalidRowsBtn;
 	}
 	
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 	
+	/**
+	 * <p>Event Listener for the button clicks</p>
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == posBtn) {
-			if(FileData.getFileCount() < 3) {
-				this.openFileChooser(FileType.POS);
-			}
+			this.openFileChooser(FileType.POS);
 		}
 		if(e.getSource() == authBtn) {
-			if(Validation.validateFileUpload(FileType.UNCAPTURED_AUTH)) {
-				this.openFileChooser(FileType.UNCAPTURED_AUTH);
-			}
+			this.openFileChooser(FileType.UNCAPTURED_AUTH);
 		}
 		if(e.getSource() == batchedBtn) {
-			if(Validation.validateFileUpload(FileType.CAPTURED)) {
-				this.openFileChooser(FileType.CAPTURED);
-			}
+			this.openFileChooser(FileType.CAPTURED);
+		}
+		if(e.getSource() == deleteFileBtn) {
+			this.deleteSelectedFile();
 		}
 		if(e.getSource() == clearBtn) {
-			int row = this.matchedColumnsTable.getSelectedRow();
-			int col = this.matchedColumnsTable.getSelectedColumn();
+			int row = this.matchedHeadersTable.getSelectedRow();
+			int col = this.matchedHeadersTable.getSelectedColumn();
+			String value = (String) this.matchedHeadersTable.getValueAt(row, col);
+			FileType type = null;
+			boolean posUpdate = true;
+			if(col == 1) {type = FileType.UNCAPTURED_AUTH;}
+			if(col == 2) {type = FileType.CAPTURED;}
 			if(col > 0 && row >= 0) {
 				ColumnData.clearCell(row, col);
-			}
-		}
-		if(e.getSource() == fileLineValidateBtn) {
-			if(FileData.getAllFiles().size() > 1  ){
-				InvalidLinesData.setInvalidLinesData();
-				for(FileModel model : FileData.getAllFiles()) {
-					//model.validateFileRows();
-					
-//					if(!model.getIsValidated()) {
-//						model.validateFileRows();
-//						model.setIsValidated();
-//					}
+				FileData.getFileModel(type).getFileContents().updateSelectedHeaders(null, value);
+				for(int i = 1; i < 3; i++) {
+					if(ColumnData.getTableData().getValueAt(this.selectedRow, i) != null) {
+						posUpdate = false;
+					}
 				}
-				this.notifyObservers("InvalidLines");
+				if(posUpdate) {
+					FileData.getFileModel(FileType.POS).getFileContents().updateSelectedHeaders(null, (String)ColumnData.getTableData().getValueAt(this.selectedRow, 0));
+				}
 			}
 		}
-		if(e.getSource() == removeBtn) {
-			this.deleteSelectedItem();
+		if(e.getSource() == invalidRowsBtn) {
+			this.notifyObservers("InvalidRows");
 		}
 	}
+
 	
 	// --------------- BUTTON STATE TOGGLE ---------------------
 	
 	
-	// Sets button state. Stored in ComponentData file.
+	/**
+	 * <p>Sets the state of the file load buttons on upload and delete</p>
+	 * @param type The file type being uploaded or deleted
+	 */
 	private void setButtonEnabled(FileType type) {
 		switch(type) {
 			case POS:
@@ -194,23 +214,31 @@ public class FileController extends Controller  {
 		}
 	}
 	
-//===========================================================================
+//==========================================================================================================
 
-		// ADDING A FILE TO THE PROGRAM
+								// ADDING A FILE TO THE PROGRAM
 
-//===========================================================================
+//==========================================================================================================
 	
+	/**
+	 * <p>
+	 * Opens the file dialog window and lets the user select a file.
+	 * Saves the FileModel, and sets the JLists with the appropriate data
+	 * for headers. Disables appropriate file add button.
+	 * </p>
+	 * @param type
+	 */
 	private void openFileChooser(FileType type) {
 		try {
 			JFileChooser fc = new JFileChooser("C:\\users\\mgries\\eclipse-workspace\\testfiles\\containsnullorempty");
-			int choice = fc.showDialog(this.view, "Open");
+			int choice = fc.showDialog(this.view, "Add File");
 			if(choice == JFileChooser.APPROVE_OPTION) {
 				File f = fc.getSelectedFile();
 				if(Validation.isModelValid(f, type)) {
-					FileData.saveModel(new FileModel(f, type));
-					this.updateFileNameList();
+					FileData.saveFileModel(new FileModel(f, type));
 					this.updateColumnSelections(type);
 					this.setButtonEnabled(type);
+					this.loadFileNames();
 				}
 			}
 		}catch(Exception ex) {
@@ -218,78 +246,59 @@ public class FileController extends Controller  {
 		}
 	}
 	
-	// Add a new file to the list
-	private void updateFileNameList(){
-		this.clearFileList();
-		this.loadFileNames();
-	}
-	
-//===========================================================================
-
-		// REMOVING A FILE FROM THE PROGRAM
-
-//===========================================================================
-	
-	// Remove selected file on Delete action
-	private void deleteSelectedItem() {
+	/**
+	 * <p>
+	 * Delete the selected file. Reset the appropriate JList
+	 * and MatchedTable fields. Enables approprate file add button
+	 * </p>
+	 */
+	private void deleteSelectedFile() {
 		String sel = this.displayFileNames.getSelectedValue();
 		if(sel != null) {
-			FileModel model = FileData.getFile(sel);
+			FileModel model = FileData.getFileModel(sel);
 			FileType type = model.getFileType();
+			FileData.deleteFileModel(type);
 			this.setButtonEnabled(type);
-			this.clearFileList();
-			this.clearColumns(type);
-			FileData.deleteModel(model);
 			this.loadFileNames();
+			this.updateColumnSelections(type);
+			ColumnData.clearMatchedCells(type);
 		}
 	}
 	
-	private void clearFileList() {
-		this.displayFileNames.clearSelection();
-		this.fileNamesListModel.clear();
-	}
+	// --------------------------- FILE COLUMN LIST CONTROLS ---------------------------------
 	
-	private void clearColumns(FileType type) {
+	private void updateColumnSelections(FileType type) {
 		switch(type) {
 			case POS:
-				this.matchedColumnsTable.clearSelection();
-				ColumnData.getTableData().setRowCount(0);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearAllSelectedLinesColumns();
-				FileData.setIsPOSLoadedFlag();
-				this.selectedRow = -1;
+				this.setPOSHeadersToTable();
 				break;
 			case UNCAPTURED_AUTH:
-				this.authColumnList.clearSelection();
-				this.authColumnModel.clear();
-				ColumnData.clearMatchedCells(type);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearAuthSelectedColumns();
+				this.loadAuthHeaders();
 				break;
 			case CAPTURED:
-				this.batchedColumnList.clearSelection();
-				this.batchedColumnModel.clear();
-				ColumnData.clearMatchedCells(type);
-				ColumnData.clearMatchedIndexes(type);
-				InvalidLinesData.clearBatchedSelectedColumns();
+				this.loadBatchedHeaders();
 				break;
 		}
 	}
 	
-//===========================================================================
+//==========================================================================================================
 	
-	//FILE LISTS
+											//FILE LISTS
 
-//===========================================================================
+//==========================================================================================================
 	
-	//------------ Uploaded Files to Display --------------------------
+	//---------------------------- Uploaded Files to Display --------------------------------------
 	
 	private DefaultListModel<String> fileNamesListModel = new DefaultListModel<String>();
 	private JList<String> displayFileNames;
 	private JScrollPane fileNameListContainer;
 	
 	
-	// Display uploaded file names in a JList
+	/**
+	 * <p>
+	 * This display and select list for uploaded file names
+	 * </p>
+	 */
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
 		this.displayFileNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -299,208 +308,247 @@ public class FileController extends Controller  {
 		return this.fileNameListContainer;
 	}
 		
-	// Load existing files when navigating back to the page
+	/**
+	 * <p>
+	 * Loads the list of file names from the stored FileModels in 
+	 * FileData static class file
+	 * </p>
+	 * @return
+	 */
 	private DefaultListModel<String> loadFileNames(){
-		Iterator<FileModel> i = FileData.getAllFiles().iterator();
+		this.fileNamesListModel.clear();
+		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
 		while(i.hasNext()) {
 			this.fileNamesListModel.addElement((String)i.next().getName());
 		}
 		return this.fileNamesListModel;
 	}
 	
-//===========================================================================
+//==========================================================================================================
 
-	// COLUMN SELECTOR - Display Uncaptured-auth and captured file headers
+			// COLUMN SELECTOR - Display Uncaptured-auth and captured file headers
 
-//===========================================================================
+//==========================================================================================================
 	
-	// -------------- UNCAPTURED AUTHORIZATION FILES ----------------
+	// ---------------------------- UNCAPTURED AUTHORIZATION FILES ----------------------------
 	
-	private DefaultListModel<String> authColumnModel = new DefaultListModel<String>();
-	private JList<String> authColumnList;
-	private JScrollPane authColumnListContainer;
+	private DefaultListModel<String> authHeaderModel = new DefaultListModel<String>();
+	private JList<String> authHeaderList;
+	private JScrollPane authHeaderListContainer;
 	
-	public JPanel getAuthColumnList() {
+	/**
+	 * <p>
+	 * Panel that holds the JList for the uncapturedAuth headers.
+	 * Loaded to FileView
+	 * </p>
+	 */
+	public JPanel getAuthHeaderList() {
 		JPanel p = new JPanel();
-		JLabel l = new JLabel("Uncaptured Auth Columns");
+		JLabel l = new JLabel("Uncaptured Auth Headers");
 		
 		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		p.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
 		// Should take a load method instead of directly assigning the model
-		this.authColumnList = new JList<String>(this.loadAuthColumns());
-		this.authColumnList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.authColumnList.addListSelectionListener(this);
-		this.authColumnList.setVisibleRowCount(6);
-		this.authColumnListContainer = new JScrollPane(this.authColumnList);
+		this.authHeaderList = new JList<String>(this.loadAuthHeaders());
+		this.authHeaderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.authHeaderList.addListSelectionListener(this);
+		this.authHeaderList.setVisibleRowCount(6);
+		this.authHeaderListContainer = new JScrollPane(this.authHeaderList);
 		
 		Border bevel = BorderFactory.createLoweredBevelBorder();
-		this.authColumnListContainer.setBorder(bevel);
+		this.authHeaderListContainer.setBorder(bevel);
 		
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.authColumnListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.authHeaderListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		p.add(l);
-		p.add(this.authColumnListContainer);
+		p.add(this.authHeaderListContainer);
 		
 		return p;
 	}
 	
-	private DefaultListModel<String> loadAuthColumns(){
-		if(FileData.getFile(FileType.UNCAPTURED_AUTH) != null) {
-			Iterator<String> i = FileData.getFile(FileType.UNCAPTURED_AUTH).getHeaderNames().iterator();
-			while(i.hasNext()) {
-				this.authColumnModel.addElement(i.next());
+	/**
+	 * <p>
+	 * When adding file, adds file headers to JList selection scrollpane.
+	 * When removing file, clears the JList selection scrollpane
+	 * </p>
+	 * @return DefaultListModel for uncaptureAuth header list
+	 */
+	private DefaultListModel<String> loadAuthHeaders(){
+		if(FileData.getFileModel(FileType.UNCAPTURED_AUTH) != null) {
+			FileModel model = FileData.getFileModel(FileType.UNCAPTURED_AUTH);
+			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
+			while(headers.hasNext()) {
+				this.authHeaderModel.addElement(headers.next());
 			}
+		}else {
+			this.authHeaderModel.clear();
 		}
-		return this.authColumnModel;
+		return this.authHeaderModel;
 	}
 	
-	// --------------- BATCHED TRANS COLUMN LIST -------------------
+	// --------------------------- BATCHED TRANS COLUMN LIST ---------------------------------------------------
 	
-	private DefaultListModel<String> batchedColumnModel = new DefaultListModel<String>();
-	private JList<String> batchedColumnList;
-	private JScrollPane batchedColumnListContainer;
+	private DefaultListModel<String> batchedHeaderModel = new DefaultListModel<String>();
+	private JList<String> batchedHeaderList;
+	private JScrollPane batchedHeaderListContainer;
 	
-	public JPanel getBatchedColumnList() {
+	/**
+	 * <p>
+	 * Panel that holds the JList for the captured headers.
+	 * Loaded to FileView
+	 * </p>
+	 */
+	public JPanel getBatchedHeaderList() {
 		JPanel p = new JPanel();
-		JLabel l = new JLabel("Batched Trans Columns");
+		JLabel l = new JLabel("Batched Trans Headers");
 		
 		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		
-		this.batchedColumnList = new JList<String>(this.loadBatchedColumns());
-		this.batchedColumnList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.batchedColumnList.addListSelectionListener(this);
-		this.batchedColumnList.setVisibleRowCount(6);
-		this.batchedColumnListContainer = new JScrollPane(this.batchedColumnList);
+		this.batchedHeaderList = new JList<String>(this.loadBatchedHeaders());
+		this.batchedHeaderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.batchedHeaderList.addListSelectionListener(this);
+		this.batchedHeaderList.setVisibleRowCount(6);
+		this.batchedHeaderListContainer = new JScrollPane(this.batchedHeaderList);
 
 		p.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		
 		Border bevel = BorderFactory.createLoweredBevelBorder();
-		this.batchedColumnListContainer.setBorder(bevel);
+		this.batchedHeaderListContainer.setBorder(bevel);
 		
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.batchedColumnListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.batchedHeaderListContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		p.add(Box.createRigidArea(new Dimension(10, 0)));
 		p.add(l);
 		p.add(Box.createRigidArea(new Dimension(10, 0)));
-		p.add(this.batchedColumnListContainer);
+		p.add(this.batchedHeaderListContainer);
 		
 		return p;
 	}
 	
-	private DefaultListModel<String> loadBatchedColumns(){
-		if(FileData.getFile(FileType.CAPTURED) != null) {
-			Iterator<String> i = FileData.getFile(FileType.CAPTURED).getHeaderNames().iterator();
-			while(i.hasNext()) {
-				this.batchedColumnModel.addElement(i.next());
+	/**
+	 * <p>
+	 * When adding file, adds file headers to JList selection scrollpane.
+	 * When removing file, clears the JList selection scrollpane
+	 * </p>
+	 * @return DefaultListModel for captured header list
+	 */
+	private DefaultListModel<String> loadBatchedHeaders(){
+		if(FileData.getFileModel(FileType.CAPTURED) != null) {
+			FileModel model = FileData.getFileModel(FileType.CAPTURED);
+			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
+			while(headers.hasNext()) {
+				this.batchedHeaderModel.addElement(headers.next());
 			}
+		}else {
+			this.batchedHeaderModel.clear();
 		}
-		return this.batchedColumnModel;
+		return this.batchedHeaderModel;
+	}
+
+//==========================================================================================================
+
+								// SELECTED COLUMNS LIST
+
+//==========================================================================================================
+
+	private JTable matchedHeadersTable = null;
+	private JScrollPane matchedHeadersScrollPane;
+	private int selectedRow = -1;
+	
+	/**
+	 * <p>
+	 * Loads the Matched Headers Table to the View.
+	 * <p>
+	 */
+	public JScrollPane getMatchedHeadersTable() {
+		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
+		this.matchedHeadersTable.addMouseListener(this);
+		this.matchedHeadersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.matchedHeadersScrollPane = new JScrollPane(this.matchedHeadersTable);
+		return this.matchedHeadersScrollPane;
 	}
 	
-	// --------------- FILE COLUMN LIST CONTROLS -------------------
+	/**
+	 * <p>
+	 * Loads the DefaultTableModel for the Matched Headers table
+	 * from ColumnData static class file.
+	 * </p>
+	 * @return
+	 */
+	private DefaultTableModel loadMatchedHeadersTableModel() {
+		return ColumnData.getTableData();
+	}
 	
-	private void updateColumnSelections(FileType type) {
-		switch(type) {
-			case POS:
-				this.setPOSColumnsToTable();
-				ColumnData.setPosHeadersSize(FileData.getFile(type).getColumnCount());
-				ColumnData.setMatchedIndexes();
-				break;
-			case UNCAPTURED_AUTH:
-				this.loadAuthColumns();
-				if(FileData.getIsPOSLoadedFlag()) {
-					ColumnData.setMatchedOnAuth();
-				}
-				break;
-			case CAPTURED:
-				this.loadBatchedColumns();
-				if(FileData.getIsPOSLoadedFlag()) {
-					ColumnData.setMatchedOnBatched();
-				}
-				break;
+	/**
+	 * <p>
+	 * Load the headers from the POS table to the Matched Header Table
+	 * </p>
+	 */
+	private void setPOSHeadersToTable() {
+		this.selectedRow = -1;
+		if(FileData.getFileModel(FileType.POS) != null) {
+			FileModel posModel = FileData.getFileModel(FileType.POS);
+			ColumnData.setPOSHeadersToTableData(posModel.getFileContents().getHeaderNames());
+		}else {
+			ColumnData.getTableData().setRowCount(0);
 		}
 	}
 	
-	public void valueChanged(ListSelectionEvent le) {
-		if(!le.getValueIsAdjusting() && this.selectedRow > -1) {
-			@SuppressWarnings("unchecked")
-			JList<String> list = (JList<String>) le.getSource();
-			String value = "";
-			int index = -1;
-			
-			if(le.getSource() == authColumnList) {
-				value = (String) list.getSelectedValue();
-				index = (int) list.getSelectedIndex();
-				this.updateMatchedColumnModel(value, FileType.UNCAPTURED_AUTH, index);	
-			}
-			if(le.getSource() == batchedColumnList) {
-				value = (String) list.getSelectedValue();
-				index = (int) list.getSelectedIndex();
-				this.updateMatchedColumnModel(value, FileType.CAPTURED, index);
-			}
-		}
-	}
-		
+	/**
+	 * <p>
+	 * Listens for selected rows in the Matched Table Headers
+	 * and set the selected index to a variable so the program
+	 * knows which row in the table is being updated.
+	 * </p>
+	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
 		JTable table = (JTable) e.getSource();
 		this.selectedRow = table.getSelectedRow();
 	}
-
-//===========================================================================
-
-	// SELECTED COLUMNS LIST
-
-//===========================================================================
-
-	private JTable matchedColumnsTable = null;
-	private JScrollPane matchedColumnsScrollPane;
-	private int selectedRow = -1;
 	
-	public JScrollPane getMatchedColumnsTable() {
-		this.matchedColumnsTable = new JTable(this.loadMatchedColumnTableModel());
-		this.matchedColumnsTable.addMouseListener(this);
-		this.matchedColumnsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.matchedColumnsScrollPane = new JScrollPane(this.matchedColumnsTable);
-		return this.matchedColumnsScrollPane;
-	}
-	
-	private DefaultTableModel loadMatchedColumnTableModel() {
-		if(!ColumnData.getPOSHeadersSetFlag()) {
-			this.setHeadersToMatchTable();
+	/**
+	 * <p>
+	 * List selection listener for when unAuthed or Batched List items
+	 * are selected. Controls whether an items is added to the Matched Header Table,
+	 * when an item is removed from the matched header table. This will also
+	 * update the selected header list in the selected file model.
+	 * </p>
+	 */
+	public void valueChanged(ListSelectionEvent le) {
+		
+		if(!le.getValueIsAdjusting() && this.selectedRow > -1) {
+			@SuppressWarnings("unchecked")
+			JList<String> list = (JList<String>) le.getSource();
+			FileType type = null;
+			int colPos = -1;
+			String value = "";
+			String oldValue = null;
+			String posValue = (String)ColumnData.getTableData().getValueAt(this.selectedRow, 0);
+			int index = list.getSelectedIndex();
+			
+			// Do nothing if list is not batched or unAuthed list (avoid null pointer on delete file)
+			if(le.getSource() == displayFileNames || index < 0) {return;}
+
+			if(le.getSource() == authHeaderList) {
+				type = FileType.UNCAPTURED_AUTH;
+				colPos = 1;
+			}
+			if(le.getSource() == batchedHeaderList) {
+				type = FileType.CAPTURED;
+				colPos = 2;
+			}
+			
+			// Get new value and old value if it exists. Controls whether we are just adding
+			// or replacing a value in the selected list
+			value = (String) list.getSelectedValue();
+			// Value to replace, or null if no value currently exists at indexes
+			oldValue = ColumnData.updateTableData(value, selectedRow, colPos);
+			FileData.getFileModel(type).getFileContents().updateSelectedHeaders(value, oldValue);
+			FileData.getFileModel(FileType.POS).getFileContents().updateSelectedHeaders(posValue, null);
 		}
-		return ColumnData.getTableData();
-	}
-	
-	private void setHeadersToMatchTable() {
-		for(String header : ColumnData.getMatchedTableHeaders()) {
-			ColumnData.getTableData().addColumn(header);
-		}
-		ColumnData.setPOSHeadersSetFlag();
-	}
-	
-	private void setPOSColumnsToTable() {
-		this.selectedRow = -1;
-		ColumnData.setPOSColumnsToTableData(FileData.getFile(FileType.POS).getHeaderNames());
-	}
-	
-	private void updateMatchedColumnModel(String txt, FileType type, int colIndex) {
-		int column = -1;
-		switch(type) {
-		case UNCAPTURED_AUTH:
-			column = 1;
-			break;
-		case CAPTURED:
-			column = 2;
-			break;
-		default:
-			System.out.println("Something went wrong");
-			break;
-		}
-		ColumnData.updateTableData(txt, selectedRow, column);
-		ColumnData.updateMatchedIndexes(type, selectedRow, colIndex);
 	}
 }
