@@ -1,7 +1,7 @@
 package com.freedompay.application;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
-
+import com.freedompay.views.View;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,17 +10,27 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
 
+//TODO: Figure out how to set the focus on the nav links based on the 
+// current view state.
 
-
-public class MainMenu extends JMenuBar implements IRouteService, ActionListener {
+/**
+ * <p>
+ * This is the navigation menu. It works like a nav menu on a website
+ * </p>
+ * @author MGries
+ *
+ */
+public class MainMenu extends JMenuBar implements IRouteService, IRouteListener, ActionListener {
 	
 	private static final long serialVersionUID = 6911428215410883596L;
 	
 	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
+	// Nav buttons that act like site links
 	private JButton home;
 	private JButton files;
-	private JButton invalidLines;
+	private JButton invalidRows;
+	private JButton matchedRows;
 	private JButton exit;
 	
 	public void addObserver(IRouteListener obj) {
@@ -38,6 +48,18 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		}
 	}
 	
+	// TODO:
+	// This is already set up in the RouteConfig.
+	// Figure out how to set the focus on the nav link here.
+	// The view is the object being passed in from RouteConfig
+	@Override
+	public void update(Object obj) {
+		
+	}
+	
+	/**
+	 * <p>Build the navigation menu</p>
+	 */
 	public void build() {
 		home = new JButton("Home");
 		home.setOpaque(true);
@@ -49,10 +71,15 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		files.setBackground(Color.WHITE);
 		files.setBorderPainted(false);
 		
-		invalidLines = new JButton("Invalid Lines");
-		invalidLines.setOpaque(true);
-		invalidLines.setBackground(Color.WHITE);
-		invalidLines.setBorderPainted(false);
+		invalidRows = new JButton("Invalid Rows");
+		invalidRows.setOpaque(true);
+		invalidRows.setBackground(Color.WHITE);
+		invalidRows.setBorderPainted(false);
+		
+		matchedRows = new JButton("Matched Rows");
+		matchedRows.setOpaque(true);
+		matchedRows.setBackground(Color.WHITE);
+		matchedRows.setBorderPainted(false);
 		
 		exit = new JButton("Exit");
 		exit.setOpaque(true);
@@ -61,15 +88,22 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		
 		home.addActionListener(this);
 		files.addActionListener(this);
-		invalidLines.addActionListener(this);
+		invalidRows.addActionListener(this);
+		matchedRows.addActionListener(this);
 		exit.addActionListener(this);
 		
 		add(home);
 		add(files);
-		add(invalidLines);
+		add(invalidRows);
+		add(matchedRows);
 		add(exit);
 	}
 	
+	/**
+	 * <p>
+	 * Notifies the RouteConfig when a link is clicked
+	 * </p>
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == home) {
@@ -78,8 +112,12 @@ public class MainMenu extends JMenuBar implements IRouteService, ActionListener 
 		if(e.getSource() == files) {
 			this.notifyObservers("Files");
 		}
-		if(e.getSource() == invalidLines) {
-			this.notifyObservers("InvalidLines");
+		if(e.getSource() == invalidRows) {
+			
+			this.notifyObservers("InvalidRows");
+		}
+		if(e.getSource() == matchedRows) {
+			this.notifyObservers("MatchedRows");
 		}
 		if(e.getSource() == exit) {
 			System.exit(0);

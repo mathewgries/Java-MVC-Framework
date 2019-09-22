@@ -5,84 +5,61 @@ import com.freedompay.models.FileModel;
 import com.freedompay.util.ErrorType;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+/**
+ * <p>
+ * Static validation class for validating files and field values
+ * </p>
+ * @author MGries
+ *
+ */
 public class Validation {
-	
+	/**
+	 * <p>
+	 * Main validation method that calls the other validation methods
+	 * </p>
+	 * @param model the file model to validate
+	 */
 	public static void runValidation(FileModel model) {
-		List<ArrayList<String>> lines = Validation.loadColumnsForValidation(model);
-		List<String> headers = Validation.loadHeadersForValidation(model);
-		Validation.validateNullAndEmptyString(model, lines);
-		Validation.validateLast4Value(model, lines, headers);
-		Validation.validateDollarAmountIsNumeric(model, lines, headers);
-	}
-	
-	private static List<String> loadHeadersForValidation(FileModel model) {
-		List<String> results = new ArrayList<String>();
-		List<Integer> colPos = null;
-		List<String> headers = model.getFileContents().getHeaderNames();
+		List<ArrayList<Integer>> 	invalidRows 	= model.getFileContents().initInvalidRowIntegers();
+		List<ArrayList<String>> 	fileRows 		= model.getFileContents().getFileRows();
+		List<Integer> 				headerByIndexes = model.getFileContents().getHeaderIndexes();
+		List<ArrayList<String>> 	selectedColumns = Validation.getSelectedColumnsFromRows(fileRows, headerByIndexes);
 		
-		switch(model.getFileType()) {
-		case POS:
-			colPos = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-			results = Validation.getFileSelectedHeaders(model, colPos, headers);
-			break;
-		case UNCAPTURED_AUTH:
-			colPos = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-			results = Validation.getFileSelectedHeaders(model, colPos, headers);
-			break;
-		case CAPTURED:
-			colPos = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-			results = Validation.getFileSelectedHeaders(model, colPos, headers);
-			break;
-		}
-		return results;
+		Validation.validateNullAndEmptyString(selectedColumns, invalidRows);
+		Validation.validateLast4Value(selectedColumns, invalidRows);
+		Validation.validateDollarAmountIsNumeric(selectedColumns, invalidRows);
 	}
 	
-	private static List<String> getFileSelectedHeaders(FileModel model, List<Integer> colPos, List<String> headers){
-		List<String> results = new ArrayList<String>();
-		for(int i = 0; i < headers.size(); i++) {
-			for(int j = 0; j < colPos.size(); j++) {
-				if(i == colPos.get(j)) {
-					results.add(headers.get(i));
-				}
+	/**
+	 * <p>
+	 * Break out the columns from the rows that, for only the selected
+	 * columns to match against.
+	 * </p>
+	 * @param rows the complete file rows
+	 * @param col the indexes of the columns to pick out
+	 * @return rows with only selected colums
+	 */
+	private static List<ArrayList<String>> getSelectedColumnsFromRows(List<ArrayList<String>> rows, List<Integer> col) {
+		List<ArrayList<String>> list = new ArrayList<ArrayList<String>>();
+		for(int i = 0; i < rows.size(); i++) {
+			String[] selected = new String[col.size()];
+			for(int j = 0; j < col.size(); j++) {
+				selected[j] = rows.get(i).get(col.get(j));
 			}
+			list.add(new ArrayList<String>(Arrays.asList(selected)));
 		}
-		return results;
-	}
-	//TODO: This is where we left off. We should now have the file lines containing only the selected columns
-	// Now we need to run them through the validation above.
-	
-	private static List<ArrayList<String>> loadColumnsForValidation(FileModel model) {
-		System.out.println("Loading Columns For Validation");
-		List<ArrayList<String>> lines = new ArrayList<ArrayList<String>>();
-		List<ArrayList<String>> filelines = model.getFileContents().getFileRows();
-		List<Integer> indexes = null;
-		
-		switch(model.getFileType()) {
-			case POS:
-				indexes = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-				break;
-			case UNCAPTURED_AUTH:
-				indexes = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-				break;
-			case CAPTURED:
-				indexes = InvalidLinesData.getSelectedColumnIndexes(model.getFileType());
-				break;
-		}
-		for(int i = 1; i < filelines.size(); i++) {
-			lines.add((i - 1),new ArrayList<String>());
-			for(int j = 0; j < filelines.get(i).size();j++) {
-				for(int k = 0; k < indexes.size(); k++) {
-					if((int)indexes.get(k) == j) {
-						lines.get(i - 1).add(filelines.get(i).get(j));
-					}
-				}
-			}
-		}
-		return lines;
+		return list;
 	}
 	
+	/**
+	 * <p>Validate the uploaded file before saving the model</p>
+	 * @param model
+	 * @param type
+	 * @return
+	 */
 	public static boolean isModelValid(File model, FileType type) {
 		if(!Validation.validateCSVFile(model.getName())) {
 			return false;
@@ -130,7 +107,7 @@ public class Validation {
 		}
 		return true;
 	}
-//		
+		
 //		/**
 //		 * <p>
 //		 * Check the file for a requestId column. If it exists, return the
@@ -155,59 +132,60 @@ public class Validation {
 //			}
 //			return pos;
 //		}
-//		
-		/**
-		 * <p>
-		 * Validates file content lines for NULL or EMPTRY STRING values
-		 * </p>
-		 * @param fileName String name of the file being evaluated
-		 * @param compareList ArrayList String[] contents of the file
-		 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
-		 * @param parentComponent EntryPanel JPanel for centering the error dialog
-		 */
-		public static void validateNullAndEmptyString(FileModel model, List<ArrayList<String>> lines) {
-			int errorType = ErrorType.NULL_OR_EMPTY_VALUE.getValue();
-			// Search file contents for null. Return true if found, false if not
+	
+	/**
+	 * <p>
+	 * Validates file content lines for NULL or EMPTRY STRING values
+	 * </p>
+	 * @param fileName String name of the file being evaluated
+	 * @param compareList ArrayList String[] contents of the file
+	 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
+	 * @param parentComponent EntryPanel JPanel for centering the error dialog
+	 */
+	public static void validateNullAndEmptyString(
+			List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
+		int errorType = ErrorType.NULL_OR_EMPTY_VALUE.getValue();
+		try {
+			
+			for(int i = 1; i < fileRows.size(); i++) {
+				for(int j = 0; j < fileRows.get(i).size(); j++) {
+					String value = fileRows.get(i).get(j);
+					if(value.equalsIgnoreCase("NULL") || value.equalsIgnoreCase("")) {
+						invalidRows.get(i).add(errorType);
+						break;
+					}
+				}
+			}
+			
+		}catch(ArrayIndexOutOfBoundsException ex) {
+			System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+		}
+	}
+	
+	/**
+	 * <p>Validates the Last4 columns length</p>
+	 * @param fileName String name of file
+	 * @param compareList ArrayList<String[]> list containing values to check
+	 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
+	 */
+	public static void validateLast4Value(
+			List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
+		int errorType = ErrorType.INVALID_PAN.getValue();
+		int panPos = Validation.getPanPos(fileRows.get(0));
+		if(panPos >= 0) {
 			try {
-				
-				for(int i = 1; i < lines.size(); i++) {
-					for(int j = 0; j < lines.get(i).size(); j++) {
-						String value = lines.get(i).get(j);					
-						if(value.equalsIgnoreCase("NULL") || value.equalsIgnoreCase("")) {
-							System.out.println("Updating Invalid List");
+				for(int i = 1; i < fileRows.size(); i++) {
+					for(int j = 0; j < fileRows.get(i).size(); j++) {
+						if(j == panPos && fileRows.get(i).get(j).length() != 4){
+							invalidRows.get(i).add(errorType);
 							break;
 						}
 					}
 				}
-				
 			}catch(ArrayIndexOutOfBoundsException ex) {
 				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
 			}
 		}
-		
-		/**
-		 * <p>Validates the Last4 columns length</p>
-		 * @param fileName String name of file
-		 * @param compareList ArrayList<String[]> list containing values to check
-		 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
-		 */
-	public static void validateLast4Value(FileModel model, List<ArrayList<String>> lines, List<String> headers) {
-//		int errorType = ErrorType.INVALID_PAN.getValue();
-//		int panPos = Validation.getPanPos(headers);
-//		if(panPos >= 0) {
-//			try {
-//				for(int i = 1; i < lines.size(); i++) {
-//					for(int j = 0; j < lines.get(i).size(); j++) {
-//						if(j == panPos && lines.get(i).get(j).length() != 4){
-//							model.updateInvalidList().get(i).add(errorType);
-//							break;
-//						}
-//					}
-//				}
-//			}catch(ArrayIndexOutOfBoundsException ex) {
-//				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
-//			}
-//		}
 	}
 		
 		// Get last 4 header index
@@ -216,16 +194,16 @@ public class Validation {
 		for(int i = 0; i < headers.size(); i++) {
 			String header = headers.get(i);
 			if(
-					header.equalsIgnoreCase("LAST4") || 
-					header.equalsIgnoreCase("LAST 4")||
-					header.equalsIgnoreCase("cardnumber") ||
-					header.equalsIgnoreCase("card number") ||
-					header.equalsIgnoreCase("account") ||
-					header.equalsIgnoreCase("accountnumber") ||
-					header.equalsIgnoreCase("account number") ||
-					header.equalsIgnoreCase("acct") ||
-					header.equalsIgnoreCase("acctNmbr") ||
-					header.equalsIgnoreCase("acctNbr") ||
+					header.equalsIgnoreCase("LAST4") 			|| 
+					header.equalsIgnoreCase("LAST 4")			||
+					header.equalsIgnoreCase("cardnumber") 		||
+					header.equalsIgnoreCase("card number") 		||
+					header.equalsIgnoreCase("account") 			||
+					header.equalsIgnoreCase("accountnumber") 	||
+					header.equalsIgnoreCase("account number") 	||
+					header.equalsIgnoreCase("acct") 			||
+					header.equalsIgnoreCase("acctNmbr") 		||
+					header.equalsIgnoreCase("acctNbr") 			||
 					header.equalsIgnoreCase("acctNumber")
 			) 
 			{
@@ -243,28 +221,28 @@ public class Validation {
 	 * @param compareList ArrayList String[] contents of the file
 	 * @param linesWithErrors ArrayList String[] List to add the invalid lines to
 	 */
-	public static void validateDollarAmountIsNumeric(FileModel model, List<ArrayList<String>> lines, List<String> headers) {
-//		int errorType = ErrorType.NON_NUMERIC.getValue();
-//		ArrayList<Integer> pos = getDollarColumnPostion(headers);
-//		if(pos.size() != 0) {
-//			Validation.removeDollarSign(pos, lines);
-//			try {
-//				for(int i = 1; i < lines.size(); i++) {
-//					for(int j = 0; j < lines.get(i).size(); j++) {
-//						for(int k = 0; k < pos.size(); k++) {
-//							if(j == pos.get(k)){
-//								if(!isNumeric( lines.get(i).get(j))) {
-//									model.getInvalidRowIndexesWithEnumInts().get(i).add(errorType);
-//									break;
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}catch(ArrayIndexOutOfBoundsException ex) {
-//				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
-//			}
-//		}
+	public static void validateDollarAmountIsNumeric(List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
+		int errorType = ErrorType.NON_NUMERIC.getValue();
+		ArrayList<Integer> pos = getDollarColumnPostion(fileRows.get(0));
+		if(pos.size() != 0) {
+			Validation.removeDollarSign(pos, fileRows);
+			try {
+				for(int i = 1; i < fileRows.size(); i++) {
+					for(int j = 0; j < fileRows.get(i).size(); j++) {
+						for(int k = 0; k < pos.size(); k++) {
+							if(j == pos.get(k)){
+								if(!isNumeric(fileRows.get(i).get(j))) {
+									invalidRows.get(i).add(errorType);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}catch(ArrayIndexOutOfBoundsException ex) {
+				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+			}
+		}
 	}
 	
 	/**
@@ -278,15 +256,15 @@ public class Validation {
 			for(int i = 0; i < headers.size(); i++) {
 				String header = headers.get(i);
 				if(
-						header.equalsIgnoreCase("TOTALAMOUNT") || 
-						header.equalsIgnoreCase("APPROVEDAMOUNT") ||
-						header.equalsIgnoreCase("APPROVED AMOUNT") ||
-						header.equalsIgnoreCase("TOTAL AMOUNT") ||
-						header.equalsIgnoreCase("TOTAL") ||
-						header.equalsIgnoreCase("APPROVED") ||
-						header.equalsIgnoreCase("authorizedAmount") ||
-						header.equalsIgnoreCase("authorized Amount") ||
-						header.equalsIgnoreCase("authoAmount") ||
+						header.equalsIgnoreCase("TOTALAMOUNT") 			|| 
+						header.equalsIgnoreCase("APPROVEDAMOUNT") 		||
+						header.equalsIgnoreCase("APPROVED AMOUNT") 		||
+						header.equalsIgnoreCase("TOTAL AMOUNT") 		||
+						header.equalsIgnoreCase("TOTAL") 				||
+						header.equalsIgnoreCase("APPROVED") 			||
+						header.equalsIgnoreCase("authorizedAmount") 	||
+						header.equalsIgnoreCase("authorized Amount") 	||
+						header.equalsIgnoreCase("authoAmount") 			||
 						header.equalsIgnoreCase("authAmount")
 				) 
 				{

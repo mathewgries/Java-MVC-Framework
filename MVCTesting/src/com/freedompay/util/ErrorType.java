@@ -3,6 +3,14 @@ package com.freedompay.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * <p>
+ * Enums of the different validation errors that can be found
+ * in the files. Can also be represented by an Integer.
+ * </p>
+ * @author MGries
+ *
+ */
 public enum ErrorType {
 	NULL_OR_EMPTY_VALUE(1),
 	INVALID_PAN(2),

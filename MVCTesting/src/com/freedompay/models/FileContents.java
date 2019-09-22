@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,14 @@ import javax.swing.table.DefaultTableModel;
 import com.freedompay.data.ColumnData;
 import com.freedompay.data.FileData;
 
+/**
+ * <p>
+ * The file contents for the files uploaded to FileModel.
+ * This class is assigned in the FileModel class constructor
+ * </p>
+ * @author MGries
+ *
+ */
 public class FileContents {
 	
 	private int fileModelId;
@@ -20,8 +29,8 @@ public class FileContents {
 	protected List<String> headerNames;
 	private int rowCount;
 	private int columnCount;
-	protected List<Integer> selectedColumnsIndexes = null;
-	private List<ArrayList<Integer>> invalidRowIntegers;
+	private List<String> selectedHeaders = new ArrayList<String>();
+	private List<ArrayList<Integer>> invalidRowIntegers = null;
 	
 	public FileContents(FileModel model) {
 		this.fileModelId = model.getId();
@@ -33,12 +42,20 @@ public class FileContents {
 	
 	//======================= FILE MODEL ID =========================
 	
+	/**
+	 * The FileModel id this is assigned to
+	 * @return
+	 */
 	public int getFileModelId() {
 		return this.fileModelId;
 	}
 	
 	//========================= FILE ROWS ============================
 	
+	/**
+	 * <p>Stores the files rows to a List</p>
+	 * @param f the file object
+	 */
 	private void setFileRows(File f) {
 		fileRows = new ArrayList<ArrayList<String>>();
 		try {
@@ -53,10 +70,22 @@ public class FileContents {
 		}
 	}
 	
+	/**
+	 * <p>
+	 * The rows for the uploaded file
+	 * </p>
+	 * @return The file rows
+	 */
 	public List<ArrayList<String>> getFileRows(){
 		return this.fileRows;
 	}
 
+	/**
+	 * <p>
+	 * Print the file rows to string
+	 * </p>
+	 * @return The file rows
+	 */
 	public String fileRowsToString() {
 		String result = "";
 		for(int i = 0; i < this.fileRows.size(); i++) {
@@ -70,65 +99,131 @@ public class FileContents {
 	
 	//===================== HEADER NAMES ==============================
 	
+	/*
+	 * <p>Set the file headers to a list</p>
+	 */
 	private void setHeaderNames() {
 		headerNames = new ArrayList<String>();
 		this.headerNames = this.fileRows.get(0);
 	}
 	
+	/**
+	 * <p>Retrieve the full list of file headers</p>
+	 * @return The file headers
+	 */
 	public List<String> getHeaderNames(){
 		return this.headerNames;
 	}
 	
 	//================ FILE COUNTS - ROW and COLUMN ===================
 	
+	/**
+	 * <p>Count of rows in the file</p>
+	 * @return The file row count
+	 */
 	public int getRowCount() {
 		return this.rowCount;
 	}
 	
+	/**
+	 * <p>Count of columns in the file</p>
+	 * @return The file column count
+	 */
 	public int getColumnCount() {
 		return this.columnCount;
 	}
 	
 	//================== COLUMNS SELECTED FOR COMPARE =================
 	
-	public void setSelectedColumnIndexes() {
-		List<String> cellValues = ColumnData.getCellValues(FileData.getFileModel(this.fileModelId).getFileType());
-		
-		if(cellValues != null) {
-			this.selectedColumnsIndexes = new ArrayList<Integer>();
-			for(int i = 0; i < this.getColumnCount(); i++) {
-				for(int j = 0; j < cellValues.size(); j++) {
-					if(this.headerNames.get(i).equalsIgnoreCase(cellValues.get(j))) {
-						this.selectedColumnsIndexes.add(i);	
-					}
-				}
-			}
+	/**
+	 * <p>Store selected headers for comparison by value</p>
+	 * @param addHeader The header being added to the list
+	 * @param removeHeader The header being removed from the list
+	 */
+	public void updateSelectedHeaders(String addHeader, String removeHeader) {
+		if(removeHeader != null && this.selectedHeaders.contains(removeHeader)) {
+			this.selectedHeaders.remove(removeHeader);
+		}
+		if(addHeader != null && !this.selectedHeaders.contains(addHeader)) {
+			this.selectedHeaders.add(addHeader);
 		}
 	}
 	
-	public void setSelectedColumnIndexes(DefaultTableModel tableData) {
-		int rowCount = tableData.getRowCount();
-		this.selectedColumnsIndexes = new ArrayList<Integer>();
-		
-		for(int i = 0; i < this.getColumnCount(); i++) {
-			for(int j = 0; j < rowCount; j++) {
-				if(tableData.getValueAt(j, 1) != null || tableData.getValueAt(j, 2) != null) {
-					this.selectedColumnsIndexes.add(i);
+	/**
+	 * <p>Return the list of selected headers for comparison</p>
+	 * @return the selected header list
+	 */
+	public List<String> getSelectedHeaders(){
+		return this.selectedHeaders;
+	}
+	
+	/**
+	 * <p>
+	 * Indexes of the headers selected for comparison
+	 * Helps with seperating out the columns selected
+	 * for comparison when validating and comparing
+	 * </p>
+	 * @return
+	 */
+	public List<Integer> getHeaderIndexes(){
+		List<Integer> indexes = new ArrayList<Integer>();
+		for(int i = 0; i < this.headerNames.size(); i++) {
+			String header = this.headerNames.get(i);
+			for(int j = 0; j < this.selectedHeaders.size(); j++) {
+				if(header.equalsIgnoreCase(this.selectedHeaders.get(j))) {
+					indexes.add(i);
 				}
 			}
 		}
+		return indexes;
 	}
 	
-	public List<Integer> getSelectedColumnIndexes(){
-		return this.selectedColumnsIndexes;
+	/**
+	 * <p>
+	 * Print the selected column list to String
+	 * </p>
+	 */
+	public void printSelected() {
+		for(String header : this.selectedHeaders) {
+			System.out.println(this.getFileModelId()+ ": " + header);
+		}
 	}
 	
 	//=================================================================
 	
+	/**
+	 * Initialize the list that holds the integers for storing
+	 * invalid row indexes and their Enum ErrorType int values.
+	 * Creates one row for each row in the file, intitialized with
+	 * the rows index. The Enum ints are added to the rows during
+	 * the validation in the static Validation class.
+	 * @return Newly intitialized initInvalidRowInteger list
+	 */
+	public List<ArrayList<Integer>> initInvalidRowIntegers() {
+		this.invalidRowIntegers = new ArrayList<ArrayList<Integer>>();
+		for(int i = 0; i < this.getRowCount(); i++) {
+			this.invalidRowIntegers.add(new ArrayList<Integer>());
+			this.invalidRowIntegers.get(i).add(i);
+		}
+		return this.invalidRowIntegers;
+	}
+	
+	/**
+	 * <p>
+	 * Return the completed list of invalid rows with Enum ErrorType ints
+	 * </p>
+	 * @return invalidRowIntegers
+	 */
 	public List<ArrayList<Integer>> getInvalidRowIntegers(){
 		return this.invalidRowIntegers;
 	}
 
+	/**
+	 * <p>
+	 * Print the invalidRowsIntegers to String
+	 * </p>
+	 * @return invalidRowIntegers in String form
+	 */
 	public String invalidRowIntegersToString() {
 		String result = "";
 		for(int i = 0; i < this.invalidRowIntegers.size(); i++) {

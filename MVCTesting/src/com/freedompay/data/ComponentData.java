@@ -1,7 +1,18 @@
 package com.freedompay.data;
 
+/**
+ * <p>
+ * Saves the state of the file upload buttons.
+ * Enabled if file not uploaded. Disabled if
+ * file uploaded. This allows to switch views without
+ * losing state data.
+ * </p>
+ * @author MGries
+ *
+ */
 public class ComponentData {
 	
+	// Booleans for button state
 	private static boolean posBtnIsEnabled = true;
 	private static boolean authBtnIsEnabled = true;
 	private static boolean batchedBtnIsEnabled = true;

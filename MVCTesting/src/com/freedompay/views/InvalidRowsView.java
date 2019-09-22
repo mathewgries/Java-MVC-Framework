@@ -1,11 +1,9 @@
 package com.freedompay.views;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -14,10 +12,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
-
 import com.freedompay.controllers.Controller;
 
-public class InvalidLinesView extends View {
+/**
+ * <p>
+ * The View for the InvalidRows.
+ * </p>
+ * @author MGries
+ *
+ */
+public class InvalidRowsView extends View {
 
 	/**
 	 * 
@@ -26,6 +30,9 @@ public class InvalidLinesView extends View {
 
 	private Controller controller;
 	
+	/**
+	 * Set the InvalidRowsController
+	 */
 	@Override
 	public void addController(Controller c) {
 		controller = c;
@@ -37,6 +44,11 @@ public class InvalidLinesView extends View {
 
 //==========================================================================================
 	
+	/**
+	 * <p>
+	 * The main build method for the View
+	 * </p>
+	 */
 	@Override
 	public void build() {
 		Border bevel = BorderFactory.createLoweredBevelBorder();
@@ -56,6 +68,12 @@ public class InvalidLinesView extends View {
 	
 	private JPanel leftPanel;
 	
+	/**
+	 * <p>
+	 * Panel to hold the navigation buttons, file name selection list, and
+	 * matched headers table.
+	 * </p>
+	 */
 	private void buildLeftDivider() {
 		this.leftPanel = new JPanel();		
 		
@@ -80,6 +98,12 @@ public class InvalidLinesView extends View {
 	
 	//------------------ Uploaded File List --------------------------
 
+	/**
+	 * <p>
+	 * Filename list and matched headers table
+	 * </p>
+	 * @return JPanel with filename list and matched headers table
+	 */
 	private JPanel buildScenePanel() {
 		JPanel scene = new JPanel();
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
@@ -101,10 +125,20 @@ public class InvalidLinesView extends View {
 		return scene;
 	}
 	
+	/**
+	 * <p>
+	 * Navigation buttons
+	 * </p>
+	 * @return JPanel with buttons
+	 */
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
+		
+		JButton compareBtn = this.controller.getCompareBtn();
 		JButton backBtn = this.controller.getBackBtn();
+		
+		p.add(compareBtn);
 		p.add(backBtn);
 		return p;
 	}
@@ -119,6 +153,11 @@ public class InvalidLinesView extends View {
 	
 	//-------------- Main panel for scene and story panel ---------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the JPanel for the invalid rows table
+	 * </p>
+	 */
 	private void buildRightDivider() {
 		this.rightPanel = new JPanel();
 		this.rightPanel.setLayout(new BoxLayout(this.rightPanel, BoxLayout.PAGE_AXIS));
@@ -135,10 +174,16 @@ public class InvalidLinesView extends View {
 
 	//--------------- Show invalid lines for files -------------------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the invalid rows table
+	 * </p>
+	 * @return
+	 */
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
 		JLabel label = this.controller.getJLabel("Invalid File Lines");
-		JScrollPane invalidLines = this.controller.getInvalidLineItemsList();
+		JScrollPane invalidLines = this.controller.getInvalidRowsList();
 		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
 		
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);

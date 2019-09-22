@@ -1,18 +1,32 @@
 package com.freedompay.data;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.table.DefaultTableModel;
-
-import com.freedompay.models.FileModel;
 import com.freedompay.util.FileType;
 
+/**
+ * <p>
+ * Repository for the matched columns table data.
+ * Saves the state of the table so the user can change vies
+ * without losing the match set of columns.
+ * </p>
+ * @author MGries
+ *
+ */
 public class ColumnData {
-
+	
+	// Headers for the Matched Table
 	private static String[] tableHeaders = {"POS","Uncaptured", "Captured"};
+	// The data displayed in the table
 	private static DefaultTableModel tableDataModel = null;
 	
+	/**
+	 * <p>
+	 * Loads the POS file headers to the first row of the table when the 
+	 * file is uploaded
+	 * </p>
+	 * @param cols The headers from the file
+	 */
 	public static void setPOSHeadersToTableData(List<String> cols) {
 		tableDataModel.setRowCount(0);
 		for(String col : cols) {
@@ -20,6 +34,12 @@ public class ColumnData {
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Returns the current state of the Matched Table
+	 * </p>
+	 * @return DefaultTableModel for the matched table
+	 */
 	public static DefaultTableModel getTableData(){
 		if(ColumnData.tableDataModel == null && !FileData.getIsPOSLoadedFlag()) {
 			ColumnData.tableDataModel = new DefaultTableModel(ColumnData.tableHeaders, 0); 
@@ -27,191 +47,101 @@ public class ColumnData {
 		return ColumnData.tableDataModel;
 	}
 	
-	public static void updateTableData(String value, int selectedRow, int column) {
+	/**
+	 * <p>
+	 * Update the table data when a match is selected. This will also return
+	 * the previous value of the cell if the value is being updated. If no current
+	 * value exist, the return value is null.
+	 * </p>
+	 * @param value The value to be displayed in the table cell
+	 * @param selectedRow The row to store the value
+	 * @param column The column to store the value
+	 * @return The old value of the cell, or null
+	 */
+	public static String updateTableData(String value, int selectedRow, int column) {
+		String oldValue = null;
+		if(ColumnData.tableDataModel.getValueAt(selectedRow, column) != null) {
+			oldValue = (String) ColumnData.tableDataModel.getValueAt(selectedRow, column);
+		}
 		ColumnData.tableDataModel.setValueAt(value, selectedRow, column);
+		return oldValue;
 	}
 	
+	/**
+	 * <p>
+	 * Updates the table data model when a cell value is cleared.
+	 * </p>
+	 * @param row The row where the cell is being cleared
+	 * @param col The column where the cell is being cleared
+	 */
 	public static void clearCell(int row, int col) {
 		if(ColumnData.tableDataModel.getValueAt(row, col) != null) {
 			ColumnData.tableDataModel.setValueAt(null, row, col);	
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Clears the column for the deleted file.
+	 * </p>
+	 * @param type The FileType of the deleted file
+	 */
 	public static void clearMatchedCells(FileType type) {
 		int removeColumn = -1;
+		int checkColumn = -1;
 		int rowCount = ColumnData.tableDataModel.getRowCount();
+	
 		switch(type) {
 			case UNCAPTURED_AUTH:
 				removeColumn = 1;
+				checkColumn = 2;
 				break;
 			case CAPTURED:
 				removeColumn = 2;
+				checkColumn = 1;
 				break;
 			default:
 				break;
 		}
 		for(int i = 0; i < rowCount; i++) {
 			ColumnData.tableDataModel.setValueAt(null, i, removeColumn);
-		}
-	}
-	
-	public static List<String> getCellValues(FileType type){
-		List<String> result = new ArrayList<String>();
-		int rowCount = ColumnData.tableDataModel.getRowCount();
-		int column = -1;
-		
-		switch(type) {
-			case UNCAPTURED_AUTH:
-				column = 1;
-				break;
-			case CAPTURED:
-				column = 2;
-				break;
-			default:
-				result = null;
-				break;
-		}
-		
-		for(int i = 0; i < rowCount; i++) {
-			if(ColumnData.tableDataModel.getValueAt(i, column) != null) {
-				result.add((String)ColumnData.tableDataModel.getValueAt(i, column));
+			if(ColumnData.getTableData().getValueAt(i, checkColumn) == null) {
+				FileData.getFileModel(FileType.POS).getFileContents().updateSelectedHeaders(null, (String)ColumnData.getTableData().getValueAt(i, 0));
 			}
 		}
-		
-		if(result.size() <= 0) {
-			System.out.println("results is Null");
-			result = null;
-		}
-		
-		return result;
 	}
 	
-	//-----------------------------------------------------------------------------------
+	/**
+	 * <p>
+	 * Returns the match list for comparing the files on matched headers
+	 * </p>
+	 * @return DefaultTableModel current state
+	 */
+	public static List<ArrayList<String>> getMatchedHeaders(){
+		List<ArrayList<String>> matched = new ArrayList<ArrayList<String>>();
+		int rowCount = ColumnData.tableDataModel.getRowCount();
+		
+//		for(int i = 0; i < rowCount; i++) {
+//			for(int j = 0; j < 3; j++) {
+//				if(ColumnData.tableDataModel.getValueAt(i, 1) != null || ColumnData.tableDataModel.getValueAt(i, 2) != null) {
+//					matched.add(new ArrayList<String>())
+//				}
+//			}
+//		}
+		
+		return matched;
+	}
 	
-	private static int posHeadersSize = 0;
-	
-	// Contains one row for each header in POS file
-	// Each row contains the index from the correpsonding file's selected header to match
-	// with the header from the POS file.
-	private static List<ArrayList<Integer>> matchedOnAuth = null;
-	private static List<ArrayList<Integer>> matchedOnBatched = null;
-	
-	public static void printList(List<ArrayList<Integer>> list) {
-		for(int i = 0; i < list.size(); i++) {
-			for(int j = 0; j < list.get(i).size(); j++) {
-				System.out.print(list.get(i).get(j) + ",");
+	/**
+	 * <p>Prints the current state of the DefaultTableModel</p>
+	 */
+	public static void printMatchedTable() {
+		int rowCount = ColumnData.tableDataModel.getRowCount();
+		for(int i = 0; i < rowCount; i++) {
+			for(int j = 0; j < 3; j++) {
+				System.out.print(ColumnData.tableDataModel.getValueAt(i, j)+", ");
 			}
 			System.out.println();
-		}
-	}
-	
-	public static void setPosHeadersSize(int size) {
-		ColumnData.posHeadersSize = size;
-	}
-	
-	public static int getPosHeadersSize() {
-		return ColumnData.posHeadersSize;
-	}
-	
-	public static void setMatchedIndexes() {
-		List<FileModel> models = FileData.getAllFileModels();
-		for(FileModel model : models) {
-			if(model.getFileType() == FileType.POS) {
-				ColumnData.setMatchedOnAuth();
-				ColumnData.setMatchedOnBatched();
-			}
-			if(model.getFileType() == FileType.UNCAPTURED_AUTH && ColumnData.matchedOnAuth == null) {
-				ColumnData.setMatchedOnAuth();
-			}
-			if(model.getFileType() == FileType.CAPTURED && ColumnData.matchedOnBatched == null) {
-				ColumnData.setMatchedOnBatched();
-			}
-		}
-	}
-	
-	public static void setMatchedOnAuth() {
-		ColumnData.matchedOnAuth = new ArrayList<ArrayList<Integer>>();
-		int length = ColumnData.posHeadersSize;
-		
-		for(int i = 0; i < length; i++) {
-			ColumnData.matchedOnAuth.add(i, new ArrayList<Integer>());
-			ColumnData.matchedOnAuth.get(i).add(i);
-		}
-	}
-	
-	public static List<ArrayList<Integer>> getMatchOnAuth(){
-		return ColumnData.matchedOnAuth;
-	}
-	
-	public static void updateMatchedOnAuth(int row, int matchedIndex) {
-		int currentRowLength = ColumnData.matchedOnAuth.get(row).size();
-		
-		if(currentRowLength > 1) {
-			ColumnData.matchedOnAuth.get(row).set(1, matchedIndex);
-		}else {
-			ColumnData.matchedOnAuth.get(row).add(1, matchedIndex);
-		}
-	}
-	
-	public static void clearMatchedOnAuth() {
-		ColumnData.matchedOnAuth = null;
-	}
-	
-	public static void setMatchedOnBatched() {
-		ColumnData.matchedOnBatched = new ArrayList<ArrayList<Integer>>();
-		int length = ColumnData.posHeadersSize;
-		
-		for(int i = 0; i < length; i++) {
-			ColumnData.matchedOnBatched.add(i, new ArrayList<Integer>());
-			ColumnData.matchedOnBatched.get(i).add(i);
-		}
-	}
-	
-	public static List<ArrayList<Integer>> getMatchedOnBatched(){
-		return ColumnData.matchedOnBatched;
-	}
-	
-	public static void updateMatchedOnBatched(int row, int matchedIndex) {
-		int currentRowLength = ColumnData.matchedOnBatched.get(row).size();
-		
-		if(currentRowLength > 1) {
-			ColumnData.matchedOnBatched.get(row).set(1, matchedIndex);
-		}else {
-			ColumnData.matchedOnBatched.get(row).add(1, matchedIndex);
-		}
-	}
-	
-	public static void clearMatchedOnBatched() {
-		ColumnData.matchedOnBatched = null;
-	}
-	
-	public static void updateMatchedIndexes(FileType type, int selectedRow, int colIndex){
-		switch(type) {
-			case UNCAPTURED_AUTH:
-				ColumnData.updateMatchedOnAuth(selectedRow, colIndex);
-				break;
-			case CAPTURED:
-				ColumnData.updateMatchedOnBatched(selectedRow, colIndex);
-				break;
-			default:
-				break;
-		}
-	}
-	
-	public static void clearMatchedIndexes(FileType type) {
-		switch(type) {
-			case POS:
-				ColumnData.clearMatchedOnAuth();
-				ColumnData.clearMatchedOnBatched();
-				break;
-			case UNCAPTURED_AUTH:
-				ColumnData.clearMatchedOnAuth();
-				break;
-			case CAPTURED:
-				ColumnData.clearMatchedOnBatched();
-				break;
-			default:
-				break;
 		}
 	}
 }

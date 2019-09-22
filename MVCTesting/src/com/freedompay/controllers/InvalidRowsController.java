@@ -20,13 +20,19 @@ import com.freedompay.data.FileData;
 import com.freedompay.models.FileModel;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.util.ErrorType;
-import com.freedompay.util.FileType;
 import com.freedompay.views.View;
 
-public class InvalidLinesController extends Controller implements ListSelectionListener, ActionListener {
+/**
+ * Controller for InvalidRowsView. Sets up the Table Views to display
+ * the rows from each file that have invalid data for matching.
+ * @author MGries
+ *
+ */
+public class InvalidRowsController extends Controller implements ListSelectionListener, ActionListener {
 	
 	private View view;
 	
+	// Observer list and methods
 	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
 	public void addObserver(IRouteListener obj) {
@@ -44,6 +50,11 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Add the view to the controller
+	 * </p>
+	 */
 	@Override
 	public void addView(View v) {
 		view = v;
@@ -61,8 +72,25 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	
 	//-------------- ADD and REMOVE FILES BUTTONS ----------------
 	
+	private JButton compareBtn;
 	private JButton backBtn;
 	
+	/**
+	 * <p>
+	 * Button to change the view to the MatchedRowsView
+	 * </p>
+	 */
+	public JButton getCompareBtn() {
+		this.compareBtn = new JButton("Compare Files");
+		this.compareBtn.addActionListener(this);
+		return this.compareBtn;
+	}
+	
+	/**
+	 * <p>
+	 * Button to change the view back to the Files view.
+	 * </p>
+	 */
 	public JButton getBackBtn() {
 		this.backBtn = new JButton("Back To Files");
 		this.backBtn.addActionListener(this);
@@ -71,17 +99,26 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 	
+	/**
+	 * <p>
+	 * Event listener for when the navigation buttons are clicked
+	 * to change the view.
+	 * </p>
+	 */
 	public void actionPerformed(ActionEvent e) {
-		JButton btn = (JButton) e.getSource();
 		
-		if(btn.getText().equalsIgnoreCase("Back To Files")) {
+		if(e.getSource() == compareBtn) {
+			this.notifyObservers("MatchedRows");
+		}
+		
+		if(e.getSource() == backBtn) {
 			this.notifyObservers("Files");
 		}
 	}
 	
 //===========================================================================
 	
-	//FILE LISTS
+							//FILE LISTS
 
 //===========================================================================
 	
@@ -91,8 +128,11 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	private JList<String> displayFileNames;
 	private JScrollPane fileNameListContainer;
 	
-	
-	// Display uploaded file names in a JList
+	/**
+	 * <p>
+	 * Load the file name list to the View.
+	 * </p>
+	 */
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
 		this.displayFileNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -102,21 +142,31 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		return this.fileNameListContainer;
 	}
 		
-	// Load existing files when navigating back to the page
+	/**
+	 * <p>
+	 * Get the file names to load to the list for the View
+	 * </p>
+	 */
 	private DefaultListModel<String> loadFileNames(){
 		this.fileNamesListModel.clear();
 		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
 		while(i.hasNext()) {
-			if(i.next().getFileContents().getSelectedColumnIndexes() != null) {
-				this.fileNamesListModel.addElement((String)i.next().getName());
-			}
+			this.fileNamesListModel.addElement((String)i.next().getName());
 		}
 		return this.fileNamesListModel;
 	}
 	
+	//------------ Matched Headers Table --------------------------
+	
 	private JTable matchedHeadersTable = null;
 	private JScrollPane matchedHeadersScrollPane;
 	
+	/**
+	 * <p>
+	 * A table to display the headers from the POS file, and the headers
+	 * selected to match against in the unauthed and batched file.
+	 * </p>
+	 */
 	public JScrollPane getMatchedHeadersTable() {
 		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
 		this.matchedHeadersTable.addMouseListener(this);
@@ -125,23 +175,19 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		return this.matchedHeadersScrollPane;
 	}
 	
+	/**
+	 * <p>
+	 * Get the data for the matched headers table.
+	 * </p>
+	 * @return
+	 */
 	private DefaultTableModel loadMatchedHeadersTableModel() {
 		return ColumnData.getTableData();
-	}
-
-	private void setPOSHeadersToTable() {
-		if(FileData.getFileModel(FileType.POS) != null) {
-			FileModel posModel = FileData.getFileModel(FileType.POS);
-			ColumnData.setPOSHeadersToTableData(posModel.getFileContents().getHeaderNames());
-		}else {
-			ColumnData.getTableData().setRowCount(0);
-		}
-		
 	}
 	
 //===========================================================================
 
-	// TABLE DISPLAY FOR INVALID FILE LINES
+					// TABLE DISPLAY FOR INVALID FILE LINES
 
 //===========================================================================
 	
@@ -150,11 +196,14 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 	private DefaultTableModel invalidModel = new DefaultTableModel();
 	private JTable invalidLinesTable = null;
 	private JScrollPane tableSP;
-	private List<String> columnNames;
 	private  List<ArrayList<Integer>> errorIntegers = null;
-	//Object[][] rowData = new Object[0][0];
 	
-	public JScrollPane getInvalidLineItemsList() {
+	/**
+	 * <p>
+	 * Load the invalid rows from the file selected in the FileNames list
+	 * </p>
+	 */
+	public JScrollPane getInvalidRowsList() {
 		this.invalidLinesTable = new JTable(this.invalidModel);
 		this.invalidLinesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF );
 		this.tableSP = new JScrollPane(this.invalidLinesTable);
@@ -163,6 +212,12 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		return this.tableSP;
 	}
 	
+	/**
+	 * <p>
+	 * Event listener for when the file name selection is changed
+	 * in the file name list.
+	 * </p>
+	 */
 	public void valueChanged(ListSelectionEvent le) {
 		if(!le.getValueIsAdjusting()) {
 			@SuppressWarnings("unchecked")
@@ -172,21 +227,36 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Update the view when a file is selected in the Filename list.
+	 * </p>
+	 * @param filename the file selected in the list
+	 */
 	private void updateInvalidModel(String filename) {
 		FileModel model = FileData.getFileModel(filename);
 		this.invalidModel.setColumnCount(0);
 		this.invalidModel.setRowCount(0);
-		//this.errorIntegers = model.getInvalidRowIndexesWithEnumInts();
-	    //this.setTableHeaders(model.getHeaderNames());
-	    if(filename != null) {
-	        for(ArrayList<Integer> line : errorIntegers) {
-	        	if(line.size() > 1) {
-	        		this.invalidModel.addRow(this.printErrorLineToArray(model, line));
-	        	}
-	        }
-	    }
+		if(model.getFileContents().getInvalidRowIntegers() != null) {
+			this.errorIntegers = model.getFileContents().getInvalidRowIntegers();
+		    this.setTableHeaders(model.getFileContents().getHeaderNames());
+		    if(filename != null) {
+		        for(ArrayList<Integer> line : errorIntegers) {
+		        	if(line.size() > 1) {
+		        		this.invalidModel.addRow(this.printErrorLineToArray(model, line));
+		        	}
+		        }
+		    }
+		}
 	}
 	
+	/**
+	 * <p>
+	 * Update the column names for the Invalid Rows table when a new file
+	 * is selected.
+	 * </p>
+	 * @param headers
+	 */
 	private void setTableHeaders(List<String> headers) {
 		this.invalidModel.setColumnCount(0);
 		this.invalidModel.addColumn("Line");
@@ -197,6 +267,16 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Converts the InvalidRowInteger list from the FileModels FileContents class
+	 * to the row from the file for display in the table. Includes the error count
+	 * and error type.
+	 * </p>
+	 * @param model
+	 * @param line
+	 * @return
+	 */
 	private Object[] printErrorLineToArray(FileModel model, ArrayList<Integer> line) {
 		String[] results = new String[model.getFileContents().getColumnCount() + 3];
 		List<ArrayList<String>> lines = model.getFileContents().getFileRows();
@@ -214,6 +294,14 @@ public class InvalidLinesController extends Controller implements ListSelectionL
 		return results;
 	}
 	
+	/**
+	 * <p>
+	 * Sets the error type to string when printing the errors and rows to the 
+	 * invalid rows table.
+	 * </p>
+	 * @param value The integer for the ErrorType enum
+	 * @return The string value for the error type.
+	 */
 	private String setErrorsFromEnum(int value){
 		String errorList = "";
 		switch(ErrorType.valueOf(value)) {

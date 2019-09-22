@@ -15,7 +15,17 @@ import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
 import com.freedompay.views.View;
 
+/**
+ * <p>
+ * The base class for the Controller classes. Not an abstract class.
+ * Contains empty method bodies. Allows the view to call anonymously to the controller
+ * <p>
+ * @author MGries
+ *
+ */
 public class Controller implements IRouteService, ActionListener, ListSelectionListener, MouseListener{
+	
+	//--------------INTERFACE METHODS -----------------
 	
 	@Override
 	public void addObserver(IRouteListener obj) {}
@@ -26,50 +36,6 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	@Override
 	public void notifyObservers(Object obj) {}
 	
-	public void addView(View v) {}
-	
-	public void addModel(Model m) {}
-	
-	public void addFileInput(JPanel p) {}
-	
-	public String getInstructions() {return null;}
-	
-	public JButton getPOSBtn() {return null;}
-	
-	public JButton getAuthBtn() {return null;}
-	
-	public JButton getBatchedBtn() {return null;}
-	
-	public JButton getClearCellBtn() {return null;}
-	
-	public JButton getDeleteFileBtn() {return null;}
-	
-	public JButton getFileLineValidateBtn() {return null;}
-	
-	public JButton getBackBtn() {return null;}
-	
-	public JButton getCompareBtn() {return null;}
-	
-	public JLabel getJLabel(String txt) {return null;}
-	
-	public JLabel getImageLabel(JPanel p) {return null;}
-	
-	public JTextArea getTextArea(String txt) {return null;}
-	
-	public JButton getButton(String txt) {return null;}
-	
-	public JScrollPane getFileNameList() {return null;}
-
-	public JScrollPane getInvalidLineItemsList() {return null;}
-	
-	public JPanel getPOSColumnList() {return null;}
-
-	public JPanel getAuthHeaderList() {return null;}
-	
-	public JPanel getBatchedHeaderList() {return null;}
-	
-	public JScrollPane getMatchedHeadersTable() {return null;}
-
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}
 
@@ -90,5 +56,62 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {}
+	
+	//------------ MVC METHODS AND HOME METHOD ---------------
+	
+	public void addView(View v) {}
+	
+	public void addModel(Model m) {}
+	
+	public String getInstructions() {return null;}
+	
+	//------------------------ BUTTONS ------------------------
+	
+	public JButton getPOSBtn() {return null;}
+	
+	public JButton getAuthBtn() {return null;}
+	
+	public JButton getBatchedBtn() {return null;}
+	
+	public JButton getClearCellBtn() {return null;}
+	
+	public JButton getDeleteFileBtn() {return null;}
+	
+	public JButton getInvalidRowsBtn() {return null;}
 
+	public JButton getBackBtn() {return null;}
+	
+	public JButton getCompareBtn() {return null;}
+	
+	public JButton getMatchedAuthBtn() {return null;}
+	
+	public JButton getMatchedBatchedBtn() {return null;}
+	
+	public JButton getNoMatchBtn() {return null;}
+	
+	public JButton getDuplicateMatchBtn() {return null;}
+	
+	//------------------ JPANEL COMPONENTS ---------------------
+	
+	public JPanel getPOSColumnList() {return null;}
+
+	public JPanel getAuthHeaderList() {return null;}
+	
+	public JPanel getBatchedHeaderList() {return null;}
+	
+	//--------------------- SCROLLPANES -------------------------
+	
+	public JScrollPane getFileNameList() {return null;}
+
+	public JScrollPane getInvalidRowsList() {return null;}
+	
+	public JScrollPane getMatchedHeadersTable() {return null;}
+	
+	//-------------------- TEXT COMPONENTS -----------------------
+	
+	public JLabel getJLabel(String txt) {return null;}
+	
+	public JLabel getImageLabel(JPanel p) {return null;}
+	
+	public JTextArea getTextArea(String txt) {return null;}
 }
