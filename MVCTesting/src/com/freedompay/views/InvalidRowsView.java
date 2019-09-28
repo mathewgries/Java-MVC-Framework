@@ -1,5 +1,4 @@
 package com.freedompay.views;
-import com.freedompay.controllers.Controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -13,13 +12,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
+import com.freedompay.controllers.Controller;
 
-public class FileView extends View {
+/**
+ * <p>
+ * The View for the InvalidRows.
+ * </p>
+ * @author MGries
+ *
+ */
+public class InvalidRowsView extends View {
 
-	private static final long serialVersionUID = -794968485917811795L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8610858178420512857L;
 
 	private Controller controller;
 	
+	/**
+	 * Set the InvalidRowsController
+	 */
 	@Override
 	public void addController(Controller c) {
 		controller = c;
@@ -31,6 +44,11 @@ public class FileView extends View {
 
 //==========================================================================================
 	
+	/**
+	 * <p>
+	 * The main build method for the View
+	 * </p>
+	 */
 	@Override
 	public void build() {
 		Border bevel = BorderFactory.createLoweredBevelBorder();
@@ -50,6 +68,12 @@ public class FileView extends View {
 	
 	private JPanel leftPanel;
 	
+	/**
+	 * <p>
+	 * Panel to hold the navigation buttons, file name selection list, and
+	 * matched headers table.
+	 * </p>
+	 */
 	private void buildLeftDivider() {
 		this.leftPanel = new JPanel();		
 		
@@ -57,7 +81,7 @@ public class FileView extends View {
 		this.leftPanel.setBorder(bevel);
 		this.leftPanel.setLayout(new BoxLayout(this.leftPanel, BoxLayout.PAGE_AXIS));
 		
-		JLabel l = this.controller.getJLabel("Select Files");
+		JLabel l = this.controller.getJLabel("Invalid Rows");
 		JPanel btnPanel = this.buildBtnPanel();
 		JPanel scene = this.buildScenePanel();
 		
@@ -74,6 +98,12 @@ public class FileView extends View {
 	
 	//------------------ Uploaded File List --------------------------
 
+	/**
+	 * <p>
+	 * Filename list and matched headers table
+	 * </p>
+	 * @return JPanel with filename list and matched headers table
+	 */
 	private JPanel buildScenePanel() {
 		JPanel scene = new JPanel();
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
@@ -95,23 +125,21 @@ public class FileView extends View {
 		return scene;
 	}
 	
+	/**
+	 * <p>
+	 * Navigation buttons
+	 * </p>
+	 * @return JPanel with buttons
+	 */
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
-		JButton posBtn = this.controller.getPOSBtn();
-		JButton unCapturedBtn = this.controller.getUncapturedBtn();
-		JButton capturedBtn = this.controller.getCapturedBtn();
-		JButton deleteFileBtn = this.controller.getDeleteFileBtn();
-		JButton clearBtn = this.controller.getClearCellBtn();
-		JButton checkErrorsBtn = this.controller.getInvalidRowsBtn();
-	
-		p.add(posBtn);
-		p.add(unCapturedBtn);
-		p.add(capturedBtn);
-		p.add(deleteFileBtn);
-		p.add(clearBtn);
-		p.add(checkErrorsBtn);
 		
+		JButton compareBtn = this.controller.getCompareBtn();
+		JButton backBtn = this.controller.getBackBtn();
+		
+		p.add(compareBtn);
+		p.add(backBtn);
 		return p;
 	}
 	
@@ -125,6 +153,11 @@ public class FileView extends View {
 	
 	//-------------- Main panel for scene and story panel ---------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the JPanel for the invalid rows table
+	 * </p>
+	 */
 	private void buildRightDivider() {
 		this.rightPanel = new JPanel();
 		this.rightPanel.setLayout(new BoxLayout(this.rightPanel, BoxLayout.PAGE_AXIS));
@@ -141,15 +174,24 @@ public class FileView extends View {
 
 	//--------------- Show invalid lines for files -------------------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the invalid rows table
+	 * </p>
+	 * @return
+	 */
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JPanel uncaptured = this.controller.getUncapturedHeaderList();
-		JPanel captured = this.controller.getCapturedHeaderList();
+		JLabel label = this.controller.getJLabel("Invalid File Lines");
+		JScrollPane invalidLines = this.controller.getInvalidRowsList();
+		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
 		
-		story.setLayout(new BoxLayout(story, BoxLayout.LINE_AXIS));
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		invalidLines.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		story.add(uncaptured);
-		story.add(captured);
+		story.add(label);
+		story.add(invalidLines);
 		return story;
 	}
+	
 }

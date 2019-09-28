@@ -1,87 +1,45 @@
 package com.freedompay.controllers;
-import com.freedompay.configuration.RouteConfig;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-
-import javax.imageio.*;
-import javax.swing.*;
-import com.freedompay.components.*;
-import com.freedompay.views.*;
-
-
+/**
+ * <p>
+ * Controller for the HomeView class
+ * </p>
+ * @author MGries
+ *
+ */
 public class HomeController extends Controller {
 	
-	private View view;
-	private DecisionPanel decisionPanel;
-	private ScenePanel scenePanel;
-	private StoryPanel storyPanel;
-	private JLabel decisionLabel;
-	private JLabel sceneLabel;
-	private JLabel storyLabel;
+	//--------------- PAGE INSTRUCTIONS ---------------------
 	
-	private Image banner;
-	private Image scaled;
-	private JLabel image;
+	// Page instruction area
+	private String instructions = "WELCOME TO THE FREEDOMPAY RECONCILIATION APP\n\n"+
+			"App instructions are lsited below. To get started, select the \"Files\" tab in the menu\n"+
+			"You can return to the home screen at anytime to review the instructions by clicking\n"+
+			"the Home tab. Your data will be saved when you return to the Files tab.\n\n\n"+ 
+			"Instructions:\n\n"+
+			"1. Click the Add button to open a file dialog\n\n"+
+			"2. Choose a file to add it to the list\n\n"+
+			"3. Choose no less than two, and no more than three files\n\n"+
+			"4. One file must be from the POS system. This file will be matched"+
+			" against the other uploaded files";
 	
-	public void addView(View v) {
-		view = v;
+	
+	// Load instructions
+	public String getInstructions() {
+		return this.instructions;
 	}
 	
-	public JLabel resizeImage() {
-		JLabel picLabel = null;
-		try {
-			this.banner = ImageIO.read(new File("src/com/freedompay/images/Banner.png"));
-			this.scaled = this.banner.getScaledInstance(
-					this.scenePanel.getWidth(),
-					this.scenePanel.getHeight(),
-					Image.SCALE_SMOOTH
-			);
-			
-	    	picLabel = new JLabel(new ImageIcon(this.scaled));
-		}catch(IOException ex) {
-			System.out.println("Cannot find image");
-			return null;
-		}
-		return picLabel;
+	// Instructions container
+	public JTextArea getTextArea(String txt) {
+		JTextArea t = new JTextArea(txt);
+		t.setLineWrap(true);
+		t.setWrapStyleWord(true);
+		return t;
 	}
-	
-	public DecisionPanel buildDecisionPanel() {
-		this.decisionPanel = new DecisionPanel();
-		this.decisionLabel = new JLabel("Decision Panel - Home");		
-		this.decisionPanel.init();
-		this.decisionPanel.add(decisionLabel);
-		this.decisionPanel.add(this.startButton());
-		return this.decisionPanel;
-	}
-	
-	public ScenePanel buildScenePanel() {
-		this.scenePanel = new ScenePanel();
-		this.sceneLabel = new JLabel("ScenePanel - Home");
-		this.scenePanel.init();
-		//this.scenePanel.add(sceneLabel);
-		image = resizeImage();
-		this.scenePanel.add(image);
-		return this.scenePanel;
-	}
-	
-	public StoryPanel buildStoryPanel() {
-		this.storyPanel = new StoryPanel();
-		this.storyLabel = new JLabel("StoryPanel - Home");
-		this.storyPanel.init();
-		this.storyPanel.add(storyLabel);
-		return this.storyPanel;
-	}
-	
-	private JButton startButton() {
-		JButton btn = new JButton("Start");
-		btn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				RouteConfig.setRoute(new FileController(), new FileView());
-			}
-		});
-		
-		return btn;
+
+	public JLabel getJLabel(String txt) {
+		return new JLabel(txt);
 	}
 }

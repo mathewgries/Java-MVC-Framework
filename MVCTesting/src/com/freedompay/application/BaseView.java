@@ -1,36 +1,43 @@
 package com.freedompay.application;
-import com.freedompay.views.*;
-import com.freedompay.configuration.RouteConfig;
-import com.freedompay.controllers.*;
-
+import com.freedompay.views.View;
+import com.freedompay.services.IRouteListener;
 import java.awt.Dimension;
 import javax.swing.*;
 
-public class BaseView extends JFrame {
+public class BaseView extends JFrame implements IRouteListener {
 	
 	private static final long serialVersionUID = -209583737245413832L;
 	
 	private MainMenu menu;
+	private View view = null;
 	
 	public void init(MainMenu mm) {
 		menu = mm;
 	}
 	
 	public void createAndShowGUI(int w, int h) {
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setTitle("MGries Java MVC Framework");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setPreferredSize(new Dimension(w, h));
-		//this.setMaximumSize(new Dimension(w,h));
-		//this.setMinimumSize(new Dimension(w, h));
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		
-		menu = new MainMenu();
 		menu.build();
-		this.setJMenuBar(menu);
 		
-		RouteConfig.setRoute(new HomeController(), new HomeView());
+		this.setJMenuBar(menu);
 		
 		this.pack();
 		this.setVisible(true);
+	}
+
+	@Override
+	public void update(Object obj) {
+		if(this.view != null) {
+			this.getContentPane().remove(this.view);
+		}
+		this.view = (View) obj;
+		this.view.build();
+		this.add(this.view);
+		this.getContentPane().invalidate();
+		this.getContentPane().validate();
 	}
 }

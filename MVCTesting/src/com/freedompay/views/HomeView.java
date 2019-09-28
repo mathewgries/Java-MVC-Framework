@@ -1,84 +1,51 @@
 package com.freedompay.views;
-import com.freedompay.components.*;
-import com.freedompay.configuration.Configure;
 import com.freedompay.controllers.*;
-
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 
-
+// TODO: See if removing the component panels, and just building them out here saves you on layout issues
+// I.E. Just create the panels you need on the view, not from importing
 public class HomeView extends View {
 
 	private static final long serialVersionUID = -2450001680426173348L;
 	
 	private Controller controller;
-	private int width;
-	private int height;
-	
-	private DecisionPanel decisionPanel;
-	private ScenePanel scenePanel;
-	private StoryPanel storyPanel;
-	
-	private JPanel leftPanel;
-	private JPanel rightPanel;
+
+	private JPanel jumbotron;
 	
 	public void addController(Controller c) {
 		controller = c;
 	}
 	
-	public void setSize() {
-		width = Configure.getVPWidth();
-		height = Configure.getVPHeight();
-	}
-	
 	public void build() {
-		this.setSize();
-		this.setPreferredSize(new Dimension(this.width, this.height));
-		this.setMaximumSize(new Dimension(this.width, this.height));
-		this.setMinimumSize(new Dimension(this.width, this.height));
+		JPanel leftSpace = new JPanel();
+		JPanel rightSpace = new JPanel();
 		
-		//this.setBackground(new Color(68, 62, 69));
+		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		
-		this.decisionPanel = controller.buildDecisionPanel();
-		this.scenePanel = controller.buildScenePanel();
-		this.storyPanel = controller.buildStoryPanel();
+		Border bevel = BorderFactory.createLoweredBevelBorder();
+		this.setBorder(bevel);
 		
-		buildPanels();
+		this.buildLeftDivider();
 		
-		leftPanel.add(decisionPanel);
-		rightPanel.add(scenePanel);
-		rightPanel.add(storyPanel);
-		
-		GroupLayout layout = new GroupLayout(this);
-		this.setLayout(layout);
-		
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
-		
-		layout.setHorizontalGroup(layout.createSequentialGroup()
-			.addComponent(leftPanel)
-			.addComponent(rightPanel)
-		);
-		
-		layout.setVerticalGroup(layout.createParallelGroup()
-			.addComponent(leftPanel)
-			.addComponent(rightPanel)
-		);
+		leftSpace.setAlignmentX(Component.CENTER_ALIGNMENT);
+		jumbotron.setAlignmentX(Component.CENTER_ALIGNMENT);
+		rightSpace.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.add(leftSpace);
+		this.add(jumbotron);
+		this.add(rightSpace);
 	}
 	
-	private void buildPanels() {
-		leftPanel = new JPanel();
-		rightPanel = new JPanel();
+	private void buildLeftDivider() {
+		this.jumbotron = new JPanel();
+		this.jumbotron.setBackground(Color.WHITE);
+		Border bevel = BorderFactory.createLoweredBevelBorder();
+		this.jumbotron.setBorder(bevel);
 		
-		leftPanel.setBackground(new Color(0,0,0,0));
-		rightPanel.setBackground(new Color(0,0,0,0));
-		
-		leftPanel.setPreferredSize(new Dimension((this.width/4), this.height));
-		leftPanel.setMinimumSize(new Dimension((this.width/4), this.height));
-		leftPanel.setMaximumSize(new Dimension((this.width/4), this.height));
-		
-		rightPanel.setPreferredSize(new Dimension(((this.width/4)*3), this.height));
-		rightPanel.setMinimumSize(new Dimension(((this.width/4)*3), this.height));
-		rightPanel.setMaximumSize(new Dimension(((this.width/4)*3), this.height));
+		JTextArea t = this.controller.getTextArea(this.controller.getInstructions());
+		t.setLineWrap(false);
+		t.setWrapStyleWord(false);
+		this.jumbotron.add(t);
 	}
 }

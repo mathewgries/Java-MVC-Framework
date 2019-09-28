@@ -1,5 +1,4 @@
 package com.freedompay.views;
-import com.freedompay.controllers.Controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -14,23 +13,29 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
-public class FileView extends View {
+import com.freedompay.controllers.Controller;
 
-	private static final long serialVersionUID = -794968485917811795L;
+public class MatchedRowsView extends View {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1629215632273169120L;
+	
 	private Controller controller;
 	
 	@Override
 	public void addController(Controller c) {
 		controller = c;
 	}
+
 	
 //==========================================================================================
-	
+
 	//BUILD THE MAIN PANEL - Stretches over entire JFrame View
 
 //==========================================================================================
-	
+		
 	@Override
 	public void build() {
 		Border bevel = BorderFactory.createLoweredBevelBorder();
@@ -41,7 +46,7 @@ public class FileView extends View {
 		this.add(leftPanel, BorderLayout.WEST);
 		this.add(rightPanel, BorderLayout.CENTER);
 	}
-	
+		
 //==========================================================================================
 	
 	//DECISION PANEL DISPLAY - Buttons for add and remove
@@ -57,7 +62,7 @@ public class FileView extends View {
 		this.leftPanel.setBorder(bevel);
 		this.leftPanel.setLayout(new BoxLayout(this.leftPanel, BoxLayout.PAGE_AXIS));
 		
-		JLabel l = this.controller.getJLabel("Select Files");
+		JLabel l = this.controller.getJLabel("Matched Rows");
 		JPanel btnPanel = this.buildBtnPanel();
 		JPanel scene = this.buildScenePanel();
 		
@@ -98,33 +103,38 @@ public class FileView extends View {
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
-		JButton posBtn = this.controller.getPOSBtn();
-		JButton unCapturedBtn = this.controller.getUncapturedBtn();
-		JButton capturedBtn = this.controller.getCapturedBtn();
-		JButton deleteFileBtn = this.controller.getDeleteFileBtn();
-		JButton clearBtn = this.controller.getClearCellBtn();
-		JButton checkErrorsBtn = this.controller.getInvalidRowsBtn();
-	
-		p.add(posBtn);
-		p.add(unCapturedBtn);
-		p.add(capturedBtn);
-		p.add(deleteFileBtn);
-		p.add(clearBtn);
-		p.add(checkErrorsBtn);
 		
+		JButton matchedUncapturedBtn = this.controller.getMatchedUncapturedBtn();
+		JButton matchedCapturedBtn = this.controller.getMatchedCapturedBtn();
+		JButton duplicateUncapturedBtn = this.controller.getDuplicateUncapturedBtn();
+		JButton duplicateCapturedBtn = this.controller.getDuplicateCapturedBtn();
+		JButton noMatchBtn = this.controller.getNoMatchBtn();
+		JButton backBtn = this.controller.getBackBtn();
+		
+		p.add(matchedUncapturedBtn);
+		p.add(matchedCapturedBtn);
+		p.add(duplicateUncapturedBtn);
+		p.add(duplicateCapturedBtn);
+		p.add(noMatchBtn);
+		p.add(backBtn);
 		return p;
 	}
 	
 //==========================================================================================
-	
+
 	//FILE DISPLAY - Show uploaded files and invalid lines for each file
 
 //==========================================================================================
-	
+		
 	private JPanel rightPanel;	
 	
 	//-------------- Main panel for scene and story panel ---------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the JPanel for the invalid rows table
+	 * </p>
+	 */
 	private void buildRightDivider() {
 		this.rightPanel = new JPanel();
 		this.rightPanel.setLayout(new BoxLayout(this.rightPanel, BoxLayout.PAGE_AXIS));
@@ -141,15 +151,23 @@ public class FileView extends View {
 
 	//--------------- Show invalid lines for files -------------------
 	
+	/**
+	 * <p>
+	 * The JPanel to hold the invalid rows table
+	 * </p>
+	 * @return
+	 */
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JPanel uncaptured = this.controller.getUncapturedHeaderList();
-		JPanel captured = this.controller.getCapturedHeaderList();
+		JLabel label = this.controller.getJLabel("Invalid File Lines");
+		JScrollPane compareResults = this.controller.getComparisonResultsTable();
+		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
 		
-		story.setLayout(new BoxLayout(story, BoxLayout.LINE_AXIS));
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		compareResults.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		story.add(uncaptured);
-		story.add(captured);
+		story.add(label);
+		story.add(compareResults);
 		return story;
 	}
 }
