@@ -1,5 +1,4 @@
 package com.freedompay.data;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import com.freedompay.util.FileType;
@@ -109,27 +108,6 @@ public class ColumnData {
 				FileData.getFileModel(FileType.POS).getFileContents().updateSelectedHeaders(null, (String)ColumnData.getTableData().getValueAt(i, 0));
 			}
 		}
-	}
-	
-	/**
-	 * <p>
-	 * Returns the match list for comparing the files on matched headers
-	 * </p>
-	 * @return DefaultTableModel current state
-	 */
-	public static List<ArrayList<String>> getMatchedHeaders(){
-		List<ArrayList<String>> matched = new ArrayList<ArrayList<String>>();
-		int rowCount = ColumnData.tableDataModel.getRowCount();
-		
-//		for(int i = 0; i < rowCount; i++) {
-//			for(int j = 0; j < 3; j++) {
-//				if(ColumnData.tableDataModel.getValueAt(i, 1) != null || ColumnData.tableDataModel.getValueAt(i, 2) != null) {
-//					matched.add(new ArrayList<String>())
-//				}
-//			}
-//		}
-		
-		return matched;
 	}
 	
 	/**

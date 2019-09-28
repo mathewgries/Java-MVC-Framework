@@ -169,8 +169,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	 */
 	public JScrollPane getMatchedHeadersTable() {
 		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
-		this.matchedHeadersTable.addMouseListener(this);
-		this.matchedHeadersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.matchedHeadersTable.setEnabled(false);
 		this.matchedHeadersScrollPane = new JScrollPane(this.matchedHeadersTable);
 		return this.matchedHeadersScrollPane;
 	}

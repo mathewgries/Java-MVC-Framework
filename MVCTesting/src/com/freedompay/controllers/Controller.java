@@ -69,9 +69,9 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JButton getPOSBtn() {return null;}
 	
-	public JButton getAuthBtn() {return null;}
+	public JButton getUncapturedBtn() {return null;}
 	
-	public JButton getBatchedBtn() {return null;}
+	public JButton getCapturedBtn() {return null;}
 	
 	public JButton getClearCellBtn() {return null;}
 	
@@ -83,21 +83,23 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JButton getCompareBtn() {return null;}
 	
-	public JButton getMatchedAuthBtn() {return null;}
+	public JButton getMatchedUncapturedBtn() {return null;}
 	
-	public JButton getMatchedBatchedBtn() {return null;}
+	public JButton getMatchedCapturedBtn() {return null;}
 	
 	public JButton getNoMatchBtn() {return null;}
 	
-	public JButton getDuplicateMatchBtn() {return null;}
+	public JButton getDuplicateUncapturedBtn() {return null;}
+	
+	public JButton getDuplicateCapturedBtn() {return null;}
 	
 	//------------------ JPANEL COMPONENTS ---------------------
 	
 	public JPanel getPOSColumnList() {return null;}
 
-	public JPanel getAuthHeaderList() {return null;}
+	public JPanel getUncapturedHeaderList() {return null;}
 	
-	public JPanel getBatchedHeaderList() {return null;}
+	public JPanel getCapturedHeaderList() {return null;}
 	
 	//--------------------- SCROLLPANES -------------------------
 	

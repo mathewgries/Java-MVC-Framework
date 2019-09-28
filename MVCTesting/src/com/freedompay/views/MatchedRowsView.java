@@ -61,7 +61,7 @@ public class MatchedRowsView extends View {
 		this.leftPanel.setBorder(bevel);
 		this.leftPanel.setLayout(new BoxLayout(this.leftPanel, BoxLayout.PAGE_AXIS));
 		
-		JLabel l = this.controller.getJLabel("FreedomPay File Compare");
+		JLabel l = this.controller.getJLabel("Matched Rows");
 		JPanel btnPanel = this.buildBtnPanel();
 		JPanel scene = this.buildScenePanel();
 		
@@ -103,16 +103,18 @@ public class MatchedRowsView extends View {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
 		
-		JButton matchedAuthBtn = this.controller.getMatchedAuthBtn();
-		JButton matchedBatchBtn = this.controller.getMatchedBatchedBtn();
+		JButton matchedUncapturedBtn = this.controller.getMatchedUncapturedBtn();
+		JButton matchedCapturedBtn = this.controller.getMatchedCapturedBtn();
+		JButton duplicateUncapturedBtn = this.controller.getDuplicateUncapturedBtn();
+		JButton duplicateCapturedBtn = this.controller.getDuplicateCapturedBtn();
 		JButton noMatchBtn = this.controller.getNoMatchBtn();
-		JButton duplicateMatchBtn = this.controller.getDuplicateMatchBtn();
 		JButton backBtn = this.controller.getBackBtn();
 		
-		p.add(matchedAuthBtn);
-		p.add(matchedBatchBtn);
+		p.add(matchedUncapturedBtn);
+		p.add(matchedCapturedBtn);
+		p.add(duplicateUncapturedBtn);
+		p.add(duplicateCapturedBtn);
 		p.add(noMatchBtn);
-		p.add(duplicateMatchBtn);
 		p.add(backBtn);
 		return p;
 	}

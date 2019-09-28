@@ -5,6 +5,8 @@ import com.freedompay.models.*;
 import com.freedompay.views.*;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
+import com.freedompay.util.Comparison;
+import com.freedompay.util.FileType;
 import com.freedompay.util.Validation;
 
 import java.util.ArrayList;
@@ -105,6 +107,9 @@ public class RouteConfig implements IRouteListener, IRouteService{
 			if(txt.equalsIgnoreCase("MatchedRows")) {
 				this.controller = new MatchedRowsController();
 				this.view = new MatchedRowsView();
+				if(FileData.getAllFileModels().size() > 1 && FileData.getIsPOSLoadedFlag()){
+					Comparison.runComparison();
+				}
 			}
 			
 			this.view.addController(this.controller);

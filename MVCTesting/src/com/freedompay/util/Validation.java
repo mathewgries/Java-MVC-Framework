@@ -1,6 +1,5 @@
 package com.freedompay.util;
 import com.freedompay.data.FileData;
-import com.freedompay.data.InvalidLinesData;
 import com.freedompay.models.FileModel;
 import com.freedompay.util.ErrorType;
 import java.io.File;
@@ -25,11 +24,11 @@ public class Validation {
 	public static void runValidation(FileModel model) {
 		List<ArrayList<Integer>> 	invalidRows 	= model.getFileContents().initInvalidRowIntegers();
 		List<ArrayList<String>> 	fileRows 		= model.getFileContents().getFileRows();
-		List<Integer> 				headerByIndexes = model.getFileContents().getHeaderIndexes();
+		List<Integer> 				headerByIndexes = model.getFileContents().getHeadersIndexes();
 		List<ArrayList<String>> 	selectedColumns = Validation.getSelectedColumnsFromRows(fileRows, headerByIndexes);
 		
 		Validation.validateNullAndEmptyString(selectedColumns, invalidRows);
-		Validation.validateLast4Value(selectedColumns, invalidRows);
+		Validation.validateLast4Value(model, fileRows, invalidRows);
 		Validation.validateDollarAmountIsNumeric(selectedColumns, invalidRows);
 	}
 	
@@ -40,10 +39,11 @@ public class Validation {
 	 * </p>
 	 * @param rows the complete file rows
 	 * @param col the indexes of the columns to pick out
-	 * @return rows with only selected colums
+	 * @return rows with only selected columns
 	 */
 	private static List<ArrayList<String>> getSelectedColumnsFromRows(List<ArrayList<String>> rows, List<Integer> col) {
 		List<ArrayList<String>> list = new ArrayList<ArrayList<String>>();
+		
 		for(int i = 0; i < rows.size(); i++) {
 			String[] selected = new String[col.size()];
 			for(int j = 0; j < col.size(); j++) {
@@ -60,11 +60,14 @@ public class Validation {
 	 * @param type
 	 * @return
 	 */
-	public static boolean isModelValid(File model, FileType type) {
+	public static boolean isModelValid(FileModel model) {
 		if(!Validation.validateCSVFile(model.getName())) {
 			return false;
 		}
-		if(!Validation.validateFileNotUploaded(model)) {
+		if(!Validation.validateFileNotUploaded(model.getFile())) {
+			return false;
+		}
+		if(model.getFileType() != FileType.POS && Validation.validateRequestIdExists(model) == -1) {
 			return false;
 		}
 		return true;
@@ -95,43 +98,37 @@ public class Validation {
 	 * @param parentComponent JPanel The JPanel the file was uploaded to
 	 * @return boolean True if the file is already uploaded
 	 */
-	public static boolean validateFileNotUploaded(File model) {
-		try {
-			for(int i = 0; i < FileData.getFileCount(); i++) {
-				if(FileData.getAllFileModels().get(i).getFile().equals(model)) {
-					return false;
-				}
+	public static boolean validateFileNotUploaded(File file) {
+		List<FileModel> models = FileData.getAllFileModels();
+		for(FileModel model : models) {
+			if(model.getFile().equals(file)) {
+				return false;
 			}
-		}catch(ArrayIndexOutOfBoundsException ex) {
-			
 		}
 		return true;
 	}
 		
-//		/**
-//		 * <p>
-//		 * Check the file for a requestId column. If it exists, return the
-//		 * position in the header list. If not, return -1
-//		 * </p>
-//		 * @param headers String[] Array to search for requestId value
-//		 * @param parentComponent	EntryPanel Japanle to attach error message
-//		 * @return	-1 if not found, or index of position if found
-//		 */
-//		public static int validateRequestIdExists(String[] headers) {
-//			int pos = -1;
-//			
-//			try {
-//			for(int i = 0; i < headers.length; i++) {
-//				if(headers[i].toUpperCase().equals("REQUESTID")) {
-//					pos = i;
-//					break;
-//				}
-//			}
-//			}catch(ArrayIndexOutOfBoundsException ex) {
-//				
-//			}
-//			return pos;
-//		}
+		/**
+		 * <p>
+		 * Check the file for a requestId column. If it exists, return the
+		 * position in the header list. If not, return -1
+		 * </p>
+		 * @param headers String[] Array to search for requestId value
+		 * @param parentComponent	EntryPanel Japanle to attach error message
+		 * @return	-1 if not found, or index of position if found
+		 */
+		public static int validateRequestIdExists(FileModel model) {
+			int pos = -1, index = 0;
+			List<String> headers = model.getFileContents().getHeaderNames();
+			
+			for(String header : headers) {
+				if(header.toUpperCase().equals("REQUESTID")) {
+					pos = index; break;
+				}
+				index++;
+			}
+			return pos;
+		}
 	
 	/**
 	 * <p>
@@ -145,20 +142,16 @@ public class Validation {
 	public static void validateNullAndEmptyString(
 			List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
 		int errorType = ErrorType.NULL_OR_EMPTY_VALUE.getValue();
-		try {
-			
-			for(int i = 1; i < fileRows.size(); i++) {
-				for(int j = 0; j < fileRows.get(i).size(); j++) {
-					String value = fileRows.get(i).get(j);
-					if(value.equalsIgnoreCase("NULL") || value.equalsIgnoreCase("")) {
-						invalidRows.get(i).add(errorType);
-						break;
-					}
+		int index = 0;
+
+		for(ArrayList<String> rows : fileRows) {
+			for(String col : rows) {
+				if(col.equalsIgnoreCase("NULL") || col.equalsIgnoreCase("")) {
+					invalidRows.get(index).add(errorType);
+					break;
 				}
 			}
-			
-		}catch(ArrayIndexOutOfBoundsException ex) {
-			System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+			index++;
 		}
 	}
 	
@@ -169,30 +162,27 @@ public class Validation {
 	 * @param linesWithErrors ArrayList<String[]> List to update with invalid lines and error message
 	 */
 	public static void validateLast4Value(
-			List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
+			FileModel model, List<ArrayList<String>> fileRows, List<ArrayList<Integer>> invalidRows) {
 		int errorType = ErrorType.INVALID_PAN.getValue();
-		int panPos = Validation.getPanPos(fileRows.get(0));
+		int panPos = Validation.getPanPos(model);
+		int index = 0;
+		
 		if(panPos >= 0) {
-			try {
-				for(int i = 1; i < fileRows.size(); i++) {
-					for(int j = 0; j < fileRows.get(i).size(); j++) {
-						if(j == panPos && fileRows.get(i).get(j).length() != 4){
-							invalidRows.get(i).add(errorType);
-							break;
-						}
-					}
+			for(ArrayList<String> rows : fileRows) {
+				if(rows.get(panPos).length() != 4) {
+					invalidRows.get(index).add(errorType);
 				}
-			}catch(ArrayIndexOutOfBoundsException ex) {
-				System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+				index++;
 			}
 		}
 	}
 		
 		// Get last 4 header index
-	private static int getPanPos(List<String> headers) {
+	private static int getPanPos(FileModel model) {
 		int panPos = -1;
-		for(int i = 0; i < headers.size(); i++) {
-			String header = headers.get(i);
+		List<String> headers = model.getFileContents().getSelectedHeaders();
+		
+		for(String header : headers) {
 			if(
 					header.equalsIgnoreCase("LAST4") 			|| 
 					header.equalsIgnoreCase("LAST 4")			||
@@ -207,9 +197,10 @@ public class Validation {
 					header.equalsIgnoreCase("acctNumber")
 			) 
 			{
-				panPos = i;
+				panPos = model.getFileContents().getHeaderIndex(header);
 				break;
 			}
+			if(panPos > -1) {break;}
 		}
 		return panPos;
 	}
@@ -252,27 +243,24 @@ public class Validation {
 	 */
 	private static ArrayList<Integer> getDollarColumnPostion(List<String> headers) {
 		ArrayList<Integer> pos = new ArrayList<Integer>();
-		try {
-			for(int i = 0; i < headers.size(); i++) {
-				String header = headers.get(i);
-				if(
-						header.equalsIgnoreCase("TOTALAMOUNT") 			|| 
-						header.equalsIgnoreCase("APPROVEDAMOUNT") 		||
-						header.equalsIgnoreCase("APPROVED AMOUNT") 		||
-						header.equalsIgnoreCase("TOTAL AMOUNT") 		||
-						header.equalsIgnoreCase("TOTAL") 				||
-						header.equalsIgnoreCase("APPROVED") 			||
-						header.equalsIgnoreCase("authorizedAmount") 	||
-						header.equalsIgnoreCase("authorized Amount") 	||
-						header.equalsIgnoreCase("authoAmount") 			||
-						header.equalsIgnoreCase("authAmount")
-				) 
-				{
-					pos.add(i);
-				}
+		int index = 0;
+
+		for(String header : headers) {
+			if(
+					header.equalsIgnoreCase("TOTALAMOUNT") 			|| 
+					header.equalsIgnoreCase("APPROVEDAMOUNT") 		||
+					header.equalsIgnoreCase("APPROVED AMOUNT") 		||
+					header.equalsIgnoreCase("TOTAL AMOUNT") 		||
+					header.equalsIgnoreCase("TOTAL") 				||
+					header.equalsIgnoreCase("APPROVED") 			||
+					header.equalsIgnoreCase("authorizedAmount") 	||
+					header.equalsIgnoreCase("authorized Amount") 	||
+					header.equalsIgnoreCase("authAmount") 			
+			) 
+			{
+				pos.add(index);
 			}
-		}catch(ArrayIndexOutOfBoundsException ex) {
-			System.out.println("Index Out Of Bounds: validateNullAndEmptyString");
+			index++;
 		}
 		return pos;
 	}
