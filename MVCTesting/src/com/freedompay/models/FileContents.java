@@ -129,6 +129,14 @@ public class FileContents {
 		return this.requestIdPos;
 	}
 	
+	public List<String> getRequestIds(){
+		List<String> requestIds = new ArrayList<String>();
+		for(ArrayList<String> row : this.fileRows) {
+			requestIds.add(row.get(requestIdPos));
+		}
+		return requestIds;
+	}
+	
 	//================ FILE COUNTS - ROW and COLUMN ===================
 	
 	/**

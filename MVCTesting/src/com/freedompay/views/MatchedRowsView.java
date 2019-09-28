@@ -1,5 +1,6 @@
 package com.freedompay.views;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -41,9 +42,9 @@ public class MatchedRowsView extends View {
 		this.setBorder(bevel);
 		this.setLayout(new BorderLayout());
 		this.buildLeftDivider();
-		//this.buildRightDivider();
+		this.buildRightDivider();
 		this.add(leftPanel, BorderLayout.WEST);
-		//this.add(rightPanel, BorderLayout.CENTER);
+		this.add(rightPanel, BorderLayout.CENTER);
 	}
 		
 //==========================================================================================
@@ -117,5 +118,56 @@ public class MatchedRowsView extends View {
 		p.add(noMatchBtn);
 		p.add(backBtn);
 		return p;
+	}
+	
+//==========================================================================================
+
+	//FILE DISPLAY - Show uploaded files and invalid lines for each file
+
+//==========================================================================================
+		
+	private JPanel rightPanel;	
+	
+	//-------------- Main panel for scene and story panel ---------
+	
+	/**
+	 * <p>
+	 * The JPanel to hold the JPanel for the invalid rows table
+	 * </p>
+	 */
+	private void buildRightDivider() {
+		this.rightPanel = new JPanel();
+		this.rightPanel.setLayout(new BoxLayout(this.rightPanel, BoxLayout.PAGE_AXIS));
+		this.rightPanel.setBackground(Color.WHITE);
+		Border bevel = BorderFactory.createLoweredBevelBorder();
+		this.rightPanel.setBorder(bevel);
+		
+		JPanel story = this.buildStoryPanel();
+		
+		story.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		this.rightPanel.add(story);
+	}
+
+	//--------------- Show invalid lines for files -------------------
+	
+	/**
+	 * <p>
+	 * The JPanel to hold the invalid rows table
+	 * </p>
+	 * @return
+	 */
+	private JPanel buildStoryPanel() {
+		JPanel story = new JPanel();
+		JLabel label = this.controller.getJLabel("Invalid File Lines");
+		JScrollPane compareResults = this.controller.getComparisonResultsTable();
+		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
+		
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		compareResults.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		story.add(label);
+		story.add(compareResults);
+		return story;
 	}
 }

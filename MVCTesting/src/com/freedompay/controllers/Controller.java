@@ -109,6 +109,8 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JScrollPane getMatchedHeadersTable() {return null;}
 	
+	public JScrollPane getComparisonResultsTable() {return null;}
+	
 	//-------------------- TEXT COMPONENTS -----------------------
 	
 	public JLabel getJLabel(String txt) {return null;}
