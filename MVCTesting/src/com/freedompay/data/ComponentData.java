@@ -18,6 +18,8 @@ public class ComponentData {
 	private static boolean capturedBtnIsEnabled = true;
 	private static boolean matchedUncapturedBtnIsEnabled = false;
 	private static boolean matchedCapturedBtnIsEnabled = false;
+	private static boolean duplicateUncapturedBtnIsEnabled = false;
+	private static boolean duplicateCapturedBtnIsEnabled = false;
 	
 	//==============================================================================
 	
@@ -54,8 +56,8 @@ public class ComponentData {
 	
 	//==============================================================================
 	
-	public static boolean setMatchedUncapturedBtnIsEnabled() {
-		ComponentData.matchedUncapturedBtnIsEnabled = ComponentData.matchedUncapturedBtnIsEnabled ? false : true;
+	public static boolean setMatchedUncapturedBtnIsEnabled(boolean isEnabled) {
+		ComponentData.matchedUncapturedBtnIsEnabled = isEnabled;
 		return ComponentData.matchedUncapturedBtnIsEnabled;
 	}
 	
@@ -65,12 +67,34 @@ public class ComponentData {
 	
 	//==============================================================================
 	
-	public static boolean setMatchedCapturedBtnIsEnabled() {
-		ComponentData.matchedCapturedBtnIsEnabled = ComponentData.matchedCapturedBtnIsEnabled ? false : true;
+	public static boolean setMatchedCapturedBtnIsEnabled(boolean isEnabled) {
+		ComponentData.matchedCapturedBtnIsEnabled = isEnabled;
 		return ComponentData.matchedCapturedBtnIsEnabled;
 	}
 	
 	public static boolean getMatchedCapturedBtnIsEnabled() {
 		return ComponentData.matchedCapturedBtnIsEnabled;
+	}
+	
+	//==============================================================================
+	
+	public static boolean setDuplicateUncapturedBtnIsEnabled(boolean isEnabled) {
+		ComponentData.duplicateUncapturedBtnIsEnabled = isEnabled;
+		return ComponentData.duplicateUncapturedBtnIsEnabled;
+	}
+	
+	public static boolean getDuplicateUncapturedBtnIsEnabled() {
+		return ComponentData.duplicateUncapturedBtnIsEnabled;
+	}
+	
+	//==============================================================================
+	
+	public static boolean setDuplicateCapturedBtnIsEnabled(boolean isEnabled) {
+		ComponentData.duplicateCapturedBtnIsEnabled = isEnabled;
+		return ComponentData.duplicateCapturedBtnIsEnabled;
+	}
+	
+	public static boolean getDuplicateCapturedBtnIsEnabled() {
+		return ComponentData.duplicateCapturedBtnIsEnabled;
 	}
 }

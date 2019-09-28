@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import com.freedompay.data.ColumnData;
+import com.freedompay.data.ComponentData;
 import com.freedompay.data.FileData;
 import com.freedompay.models.FileModel;
 
@@ -33,17 +34,62 @@ public class Comparison {
 	private static List<Integer> noCapturedMatchIndexes = null;
 	
 	private static List<Integer> noMatches = null;
+
+//======================================================================================
+	
+								// SET THE LISTS
+
+//======================================================================================
 	
 	public static void runComparison() {
 		List<FileModel> models = FileData.getAllFileModels();
+		
 		Comparison.uncapturedLoaded = false;
+		ComponentData.setMatchedUncapturedBtnIsEnabled(false);
+		ComponentData.setDuplicateUncapturedBtnIsEnabled(false);
+		
 		Comparison.capturedLoaded = false;
+		ComponentData.setMatchedCapturedBtnIsEnabled(false);
+		ComponentData.setDuplicateCapturedBtnIsEnabled(false);
+		
 		Comparison.setLoadedFlags(models);
 		Comparison.loadMatchedHeadersList();
 		Comparison.initMatchedIndexes();
 		Comparison.initFileRows();
 		Comparison.intiFileCompare();
 		Comparison.finalizeNoMatchList();
+	}
+	
+//======================================================================================
+	
+								// GET THE LISTS
+
+//======================================================================================
+	
+	//--------------------------- UNCAPTURED LISTS -------------------------------
+	
+	public static List<ArrayList<Integer>> getMatchedRowsUncapturedIndexes(){
+		return Comparison.matchedRowsUncapturedIndexes;
+	}
+	
+	public static List<ArrayList<Integer>> getDuplicateRowsUncapturedIndexes(){
+		return Comparison.duplicateRowsUncapturedIndexes;
+	}
+	
+	//----------------------------- CAPTURED LISTS ---------------------------------
+	
+	public static List<ArrayList<Integer>> getMatchedRowsCapturedIndexes(){
+		return Comparison.matchedRowsCapturedIndexes;
+	}
+	
+	public static List<ArrayList<Integer>> getDuplicateRowsCapturedIndexes(){
+		return Comparison.duplicateRowsCapturedIndexes;
+	}
+	
+	//---------------------------- NO MATCHES LIST --------------------------------------
+	
+	public static List<Integer> getNoMatches(){
+		return Comparison.noMatches;
 	}
 	
 //======================================================================================
@@ -62,10 +108,15 @@ public class Comparison {
 	private static void setLoadedFlags(List<FileModel> models) {
 		for(FileModel model : models) {
 			if(model.getFileType() == FileType.UNCAPTURED_AUTH && model.getFileContents().getHeadersIndexes().size() >= 3) {
-				uncapturedLoaded = true;
+				Comparison.uncapturedLoaded = true;
+				ComponentData.setMatchedUncapturedBtnIsEnabled(true);
+				ComponentData.setDuplicateUncapturedBtnIsEnabled(true);
 			}
+			
 			if(model.getFileType() == FileType.CAPTURED && model.getFileContents().getHeadersIndexes().size() >= 3) {
-				capturedLoaded = true;
+				Comparison.capturedLoaded = true;
+				ComponentData.setMatchedCapturedBtnIsEnabled(true);
+				ComponentData.setDuplicateCapturedBtnIsEnabled(true);
 			}
 		}
 	}
@@ -140,7 +191,7 @@ public class Comparison {
 
 	/**
 	 * <p>
-	 * Prepare the filerow lists with selected columns
+	 * Prepare the file row lists with selected columns
 	 * </p>
 	 */
 	private static void initFileRows() {
@@ -268,6 +319,8 @@ public class Comparison {
 		if(Comparison.capturedLoaded && !Comparison.uncapturedLoaded) {
 			Comparison.noMatches = Comparison.noCapturedMatchIndexes;
 		}
+		
+		Comparison.noMatches.remove(0);
 	}
 	
 //======================================================================================
