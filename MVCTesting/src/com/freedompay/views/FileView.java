@@ -57,7 +57,7 @@ public class FileView extends View {
 		this.leftPanel.setBorder(bevel);
 		this.leftPanel.setLayout(new BoxLayout(this.leftPanel, BoxLayout.PAGE_AXIS));
 		
-		JLabel l = this.controller.getJLabel("FreedomPay File Compare");
+		JLabel l = this.controller.getJLabel("Select Files");
 		JPanel btnPanel = this.buildBtnPanel();
 		JPanel scene = this.buildScenePanel();
 		
@@ -99,15 +99,15 @@ public class FileView extends View {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
 		JButton posBtn = this.controller.getPOSBtn();
-		JButton authBtn = this.controller.getAuthBtn();
-		JButton batchedBtn = this.controller.getBatchedBtn();
+		JButton unCapturedBtn = this.controller.getUncapturedBtn();
+		JButton capturedBtn = this.controller.getCapturedBtn();
 		JButton deleteFileBtn = this.controller.getDeleteFileBtn();
 		JButton clearBtn = this.controller.getClearCellBtn();
 		JButton checkErrorsBtn = this.controller.getInvalidRowsBtn();
 	
 		p.add(posBtn);
-		p.add(authBtn);
-		p.add(batchedBtn);
+		p.add(unCapturedBtn);
+		p.add(capturedBtn);
 		p.add(deleteFileBtn);
 		p.add(clearBtn);
 		p.add(checkErrorsBtn);
@@ -143,13 +143,13 @@ public class FileView extends View {
 	
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JPanel auth = this.controller.getAuthHeaderList();
-		JPanel batched = this.controller.getBatchedHeaderList();
+		JPanel uncaptured = this.controller.getUncapturedHeaderList();
+		JPanel captured = this.controller.getCapturedHeaderList();
 		
 		story.setLayout(new BoxLayout(story, BoxLayout.LINE_AXIS));
 
-		story.add(auth);
-		story.add(batched);
+		story.add(uncaptured);
+		story.add(captured);
 		return story;
 	}
 }

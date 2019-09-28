@@ -3,16 +3,13 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-
 import com.freedompay.data.ColumnData;
 import com.freedompay.data.FileData;
 import com.freedompay.models.FileModel;
@@ -63,22 +60,23 @@ public class MatchedRowsController extends Controller{
 
 	//-------------- ADD and REMOVE FILES BUTTONS ----------------
 
-	private JButton matcheAuthBtn;
-	private JButton matchedBatchBtn;
+	private JButton matcheUncapturedBtn;
+	private JButton matchedCapturedBtn;
 	private JButton noMatchBtn;
-	private JButton duplicateMatchBtn;
+	private JButton duplicateUncapturedBtn;
+	private JButton duplicateCapturedBtn;
 	private JButton backBtn;
 	
-	public JButton getMatchedAuthBtn() {
-		this.matcheAuthBtn = new JButton("Matched Uncaptured Auth");
-		this.matcheAuthBtn.addActionListener(this);
-		return this.matcheAuthBtn;
+	public JButton getMatchedUncapturedBtn() {
+		this.matcheUncapturedBtn = new JButton("Matched Uncaptured Auth");
+		this.matcheUncapturedBtn.addActionListener(this);
+		return this.matcheUncapturedBtn;
 	}
 	
-	public JButton getMatchedBatchedBtn() {
-		this.matchedBatchBtn = new JButton("Matched Captured");
-		this.matchedBatchBtn.addActionListener(this);
-		return this.matchedBatchBtn;
+	public JButton getMatchedCapturedBtn() {
+		this.matchedCapturedBtn = new JButton("Matched Captured");
+		this.matchedCapturedBtn.addActionListener(this);
+		return this.matchedCapturedBtn;
 	}
 	
 	public JButton getNoMatchBtn() {
@@ -87,14 +85,20 @@ public class MatchedRowsController extends Controller{
 		return this.noMatchBtn;
 	}
 	
-	public JButton getDuplicateMatchBtn() {
-		this.duplicateMatchBtn = new JButton("Duplicate Matches");
-		this.duplicateMatchBtn.addActionListener(this);
-		return this.duplicateMatchBtn;
+	public JButton getDuplicateUncapturedBtn() {
+		this.duplicateUncapturedBtn = new JButton("Duplicate Uncaptured Matches");
+		this.duplicateUncapturedBtn.addActionListener(this);
+		return this.duplicateUncapturedBtn;
+	}
+	
+	public JButton getDuplicateCapturedBtn() {
+		this.duplicateCapturedBtn = new JButton("Duplicate Captured Matches");
+		this.duplicateCapturedBtn.addActionListener(this);
+		return this.duplicateCapturedBtn;
 	}
 	
 	public JButton getBackBtn() {
-		this.backBtn = new JButton("Back To Invalid Rows");
+		this.backBtn = new JButton("Back To Files");
 		this.backBtn.addActionListener(this);
 		return this.backBtn;
 	}
@@ -102,10 +106,11 @@ public class MatchedRowsController extends Controller{
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 
 	public void actionPerformed(ActionEvent e) {
-		JButton btn = (JButton) e.getSource();
-
+		
+		
+		
 		if(e.getSource() == backBtn) {
-			this.notifyObservers("InvalidRows");
+			this.notifyObservers("Files");
 		}
 	}
 
@@ -125,8 +130,7 @@ public class MatchedRowsController extends Controller{
 	// Display uploaded file names in a JList
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
-		this.displayFileNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.displayFileNames.addListSelectionListener(this);
+		this.displayFileNames.setEnabled(false);
 		this.displayFileNames.setVisibleRowCount(6);
 		this.fileNameListContainer = new JScrollPane(this.displayFileNames);
 		return this.fileNameListContainer;
@@ -137,7 +141,7 @@ public class MatchedRowsController extends Controller{
 		this.fileNamesListModel.clear();
 		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
 		while(i.hasNext()) {
-			this.fileNamesListModel.addElement((String)i.next().getName());
+			this.fileNamesListModel.addElement((String)i.next().getName());	
 		}
 		return this.fileNamesListModel;
 	}
@@ -148,10 +152,14 @@ public class MatchedRowsController extends Controller{
 	private JScrollPane matchedHeadersScrollPane;
 	
 	public JScrollPane getMatchedHeadersTable() {
-		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel());
-		this.matchedHeadersTable.addMouseListener(this);
-		this.matchedHeadersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel()) {
+			private static final long serialVersionUID = 5467279387896919490L;
+			public boolean isCellEditable(int row, int col) {
+				return false;
+			}
+		};
 		this.matchedHeadersScrollPane = new JScrollPane(this.matchedHeadersTable);
+		this.matchedHeadersTable.setEnabled(false);
 		return this.matchedHeadersScrollPane;
 	}
 	

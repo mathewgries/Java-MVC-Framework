@@ -1,7 +1,6 @@
 package com.freedompay.application;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
-import com.freedompay.views.View;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,11 +26,11 @@ public class MainMenu extends JMenuBar implements IRouteService, IRouteListener,
 	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
 	// Nav buttons that act like site links
-	private JButton home;
-	private JButton files;
-	private JButton invalidRows;
-	private JButton matchedRows;
-	private JButton exit;
+	private JButton homeBtn;
+	private JButton filesBtn;
+	//private JButton invalidRowsBtn;
+	private JButton matchedRowsBtn;
+	private JButton exitBtn;
 	
 	public void addObserver(IRouteListener obj) {
 		this.observers.add(obj);
@@ -48,55 +47,68 @@ public class MainMenu extends JMenuBar implements IRouteService, IRouteListener,
 		}
 	}
 	
+
+	
+	/**
+	 * <p>Build the navigation menu</p>
+	 */
+	public void build() {
+		homeBtn = new JButton("Home");
+		homeBtn.setOpaque(true);
+		homeBtn.setBackground(Color.WHITE);
+		homeBtn.setBorderPainted(false);
+		
+		filesBtn = new JButton("Files");
+		filesBtn.setOpaque(true);
+		filesBtn.setBackground(Color.WHITE);
+		filesBtn.setBorderPainted(false);
+		
+//		invalidRowsBtn = new JButton("Invalid Rows");
+//		invalidRowsBtn.setOpaque(true);
+//		invalidRowsBtn.setBackground(Color.WHITE);
+//		invalidRowsBtn.setBorderPainted(false);
+		
+		matchedRowsBtn = new JButton("Matched Rows");
+		matchedRowsBtn.setOpaque(true);
+		matchedRowsBtn.setBackground(Color.WHITE);
+		matchedRowsBtn.setBorderPainted(false);
+		
+		exitBtn = new JButton("Exit");
+		exitBtn.setOpaque(true);
+		exitBtn.setBackground(Color.WHITE);
+		exitBtn.setBorderPainted(false);
+		
+		homeBtn.addActionListener(this);
+		filesBtn.addActionListener(this);
+//		invalidRowsBtn.addActionListener(this);
+		matchedRowsBtn.addActionListener(this);
+		exitBtn.addActionListener(this);
+		
+		add(homeBtn);
+		add(filesBtn);
+//		add(invalidRowsBtn);
+		add(matchedRowsBtn);
+		add(exitBtn);
+	}
+	
 	// TODO:
 	// This is already set up in the RouteConfig.
 	// Figure out how to set the focus on the nav link here.
 	// The view is the object being passed in from RouteConfig
 	@Override
 	public void update(Object obj) {
-		
-	}
-	
-	/**
-	 * <p>Build the navigation menu</p>
-	 */
-	public void build() {
-		home = new JButton("Home");
-		home.setOpaque(true);
-		home.setBackground(Color.WHITE);
-		home.setBorderPainted(false);
-		
-		files = new JButton("Files");
-		files.setOpaque(true);
-		files.setBackground(Color.WHITE);
-		files.setBorderPainted(false);
-		
-		invalidRows = new JButton("Invalid Rows");
-		invalidRows.setOpaque(true);
-		invalidRows.setBackground(Color.WHITE);
-		invalidRows.setBorderPainted(false);
-		
-		matchedRows = new JButton("Matched Rows");
-		matchedRows.setOpaque(true);
-		matchedRows.setBackground(Color.WHITE);
-		matchedRows.setBorderPainted(false);
-		
-		exit = new JButton("Exit");
-		exit.setOpaque(true);
-		exit.setBackground(Color.WHITE);
-		exit.setBorderPainted(false);
-		
-		home.addActionListener(this);
-		files.addActionListener(this);
-		invalidRows.addActionListener(this);
-		matchedRows.addActionListener(this);
-		exit.addActionListener(this);
-		
-		add(home);
-		add(files);
-		add(invalidRows);
-		add(matchedRows);
-		add(exit);
+		if(obj.getClass().getName().equalsIgnoreCase("com.freedompay.views.HomeView")) {
+			homeBtn.requestFocus();
+		} 
+		if(obj.getClass().getName().equalsIgnoreCase("com.freedompay.views.FileView")) {
+			filesBtn.requestFocus();	
+		} 
+//		if(obj.getClass().getName().equalsIgnoreCase("com.freedompay.views.InvalidRowsView")) {
+//			invalidRowsBtn.requestFocus();
+//		} 
+		if(obj.getClass().getName().equalsIgnoreCase("com.freedompay.views.MatchedRowsView")) {
+			matchedRowsBtn.requestFocus();
+		} 
 	}
 	
 	/**
@@ -106,20 +118,19 @@ public class MainMenu extends JMenuBar implements IRouteService, IRouteListener,
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == home) {
+		if(e.getSource() == homeBtn) {
 			this.notifyObservers("Home");
 		}
-		if(e.getSource() == files) {
+		if(e.getSource() == filesBtn) {
 			this.notifyObservers("Files");
 		}
-		if(e.getSource() == invalidRows) {
-			
-			this.notifyObservers("InvalidRows");
-		}
-		if(e.getSource() == matchedRows) {
+//		if(e.getSource() == invalidRowsBtn) {
+//			this.notifyObservers("InvalidRows");
+//		}
+		if(e.getSource() == matchedRowsBtn) {
 			this.notifyObservers("MatchedRows");
 		}
-		if(e.getSource() == exit) {
+		if(e.getSource() == exitBtn) {
 			System.exit(0);
 		}
 	}

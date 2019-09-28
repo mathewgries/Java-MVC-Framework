@@ -1,18 +1,14 @@
 package com.freedompay.models;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.table.DefaultTableModel;
-
-import com.freedompay.data.ColumnData;
 import com.freedompay.data.FileData;
+import com.freedompay.util.FileType;
 
 /**
  * <p>
@@ -26,7 +22,8 @@ public class FileContents {
 	
 	private int fileModelId;
 	private List<ArrayList<String>> fileRows;
-	protected List<String> headerNames;
+	private List<String> headerNames;
+	private int requestIdPos;
 	private int rowCount;
 	private int columnCount;
 	private List<String> selectedHeaders = new ArrayList<String>();
@@ -38,6 +35,9 @@ public class FileContents {
 		this.setHeaderNames();
 		this.rowCount = this.fileRows.size();
 		this.columnCount = this.headerNames.size();
+		if(model.getFileType() != FileType.POS) {
+			this.setRequestId();
+		}
 	}
 	
 	//======================= FILE MODEL ID =========================
@@ -115,6 +115,20 @@ public class FileContents {
 		return this.headerNames;
 	}
 	
+	private void setRequestId() {
+		int index = 0;
+		for(String header : this.getHeaderNames()) {
+			if(header.equalsIgnoreCase("REQUESTID")) {
+				this.requestIdPos = index;
+			}
+			index++;
+		}
+	}
+	
+	public int getRequestIdPos() {
+		return this.requestIdPos;
+	}
+	
 	//================ FILE COUNTS - ROW and COLUMN ===================
 	
 	/**
@@ -165,17 +179,32 @@ public class FileContents {
 	 * </p>
 	 * @return
 	 */
-	public List<Integer> getHeaderIndexes(){
+	public List<Integer> getHeadersIndexes(){
 		List<Integer> indexes = new ArrayList<Integer>();
+		// Loop through all file headers
 		for(int i = 0; i < this.headerNames.size(); i++) {
+			// Pull out the header value
 			String header = this.headerNames.get(i);
+			// Loop through the selected header list
 			for(int j = 0; j < this.selectedHeaders.size(); j++) {
+				// When a match is found, store the index from the main list
 				if(header.equalsIgnoreCase(this.selectedHeaders.get(j))) {
 					indexes.add(i);
 				}
 			}
 		}
 		return indexes;
+	}
+	
+	public Integer getHeaderIndex(String h){
+		Integer index = 0;
+		for(String header: this.headerNames) {
+			if(h.equalsIgnoreCase(header)) {
+				break;
+			}
+			index++;
+		}
+		return index;
 	}
 	
 	/**

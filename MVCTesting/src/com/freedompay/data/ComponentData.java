@@ -14,8 +14,10 @@ public class ComponentData {
 	
 	// Booleans for button state
 	private static boolean posBtnIsEnabled = true;
-	private static boolean authBtnIsEnabled = true;
-	private static boolean batchedBtnIsEnabled = true;
+	private static boolean uncapturedBtnIsEnabled = true;
+	private static boolean capturedBtnIsEnabled = true;
+	private static boolean matchedUncapturedBtnIsEnabled = false;
+	private static boolean matchedCapturedBtnIsEnabled = false;
 	
 	//==============================================================================
 	
@@ -30,23 +32,45 @@ public class ComponentData {
 	
 	//==============================================================================
 	
-	public static boolean setAuthBtnIsEnabled() {
-		ComponentData.authBtnIsEnabled = ComponentData.authBtnIsEnabled ? false : true;
-		return ComponentData.authBtnIsEnabled;
+	public static boolean setUncapturedBtnIsEnabled() {
+		ComponentData.uncapturedBtnIsEnabled = ComponentData.uncapturedBtnIsEnabled ? false : true;
+		return ComponentData.uncapturedBtnIsEnabled;
 	}
 	
-	public static boolean getAuthBtnIsEnabled() {
-		return ComponentData.authBtnIsEnabled;
+	public static boolean getUncapturedBtnIsEnabled() {
+		return ComponentData.uncapturedBtnIsEnabled;
 	}
 	
 	//==============================================================================
 	
-	public static boolean setBatchedBtnIsEnabled() {
-		ComponentData.batchedBtnIsEnabled = ComponentData.batchedBtnIsEnabled ? false : true;
-		return ComponentData.batchedBtnIsEnabled;
+	public static boolean setCapturedBtnIsEnabled() {
+		ComponentData.capturedBtnIsEnabled = ComponentData.capturedBtnIsEnabled ? false : true;
+		return ComponentData.capturedBtnIsEnabled;
 	}
 	
-	public static boolean getBatchedBtnIsEnabled() {
-		return ComponentData.batchedBtnIsEnabled;
+	public static boolean getCapturedBtnIsEnabled() {
+		return ComponentData.capturedBtnIsEnabled;
+	}
+	
+	//==============================================================================
+	
+	public static boolean setMatchedUncapturedBtnIsEnabled() {
+		ComponentData.matchedUncapturedBtnIsEnabled = ComponentData.matchedUncapturedBtnIsEnabled ? false : true;
+		return ComponentData.matchedUncapturedBtnIsEnabled;
+	}
+	
+	public static boolean getMatchedUncapturedBtnIsEnabled() {
+		return ComponentData.matchedUncapturedBtnIsEnabled;
+	}
+	
+	//==============================================================================
+	
+	public static boolean setMatchedCapturedBtnIsEnabled() {
+		ComponentData.matchedCapturedBtnIsEnabled = ComponentData.matchedCapturedBtnIsEnabled ? false : true;
+		return ComponentData.matchedCapturedBtnIsEnabled;
+	}
+	
+	public static boolean getMatchedCapturedBtnIsEnabled() {
+		return ComponentData.matchedCapturedBtnIsEnabled;
 	}
 }

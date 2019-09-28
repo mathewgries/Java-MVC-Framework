@@ -81,7 +81,7 @@ public class InvalidRowsView extends View {
 		this.leftPanel.setBorder(bevel);
 		this.leftPanel.setLayout(new BoxLayout(this.leftPanel, BoxLayout.PAGE_AXIS));
 		
-		JLabel l = this.controller.getJLabel("FreedomPay File Compare");
+		JLabel l = this.controller.getJLabel("Invalid Rows");
 		JPanel btnPanel = this.buildBtnPanel();
 		JPanel scene = this.buildScenePanel();
 		

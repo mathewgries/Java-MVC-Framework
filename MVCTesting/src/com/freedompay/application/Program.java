@@ -32,10 +32,10 @@ public class Program {
 		menu = new MainMenu();
 		
 		router.addObserver(baseView);
-		router.addObserver(menu);
 		menu.addObserver(router);
 		baseView.init(menu);
 		router.update("Home");
+		router.addObserver(menu);
 		
 		// Run the BaseView in a EDT thread
 		SwingUtilities.invokeLater(new Runnable() {
