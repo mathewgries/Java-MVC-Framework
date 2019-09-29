@@ -64,11 +64,16 @@ public class FileData {
 	 * @param name the file name
 	 */
 	public static void deleteFileModel(String name) {
+		FileType type = null;
 		Iterator<FileModel> models = FileData.getAllFileModels().iterator();
 		while(models.hasNext()) {
 			if(models.next().getName().equalsIgnoreCase(name)) {
+				type = models.next().getFileType();
 				models.remove();
 			}
+		}
+		if(type == FileType.POS) {
+			FileData.setIsPOSLoadedFlag();
 		}
 	}
 	
@@ -77,11 +82,16 @@ public class FileData {
 	 * @param fm The FileModel to be deleted
 	 */
 	public static void deleteFileModel(FileModel fm) {
+		FileType type = null;
 		Iterator<FileModel> models = FileData.getAllFileModels().iterator();
 		while(models.hasNext()) {
 			if(models.next().equals(fm)) {
+				type = models.next().getFileType();
 				models.remove();
 			}
+		}
+		if(type == FileType.POS) {
+			FileData.setIsPOSLoadedFlag();
 		}
 	}
 	
@@ -97,6 +107,9 @@ public class FileData {
 			if(models.next().getFileType() == type) {
 				models.remove();
 			}
+		}
+		if(type == FileType.POS) {
+			FileData.setIsPOSLoadedFlag();
 		}
 	}
 	
