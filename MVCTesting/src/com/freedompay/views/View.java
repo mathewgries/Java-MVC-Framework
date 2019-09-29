@@ -1,5 +1,10 @@
 package com.freedompay.views;
 
+/**
+ * The base class for the view. Not abstract.
+ * Allows for assigning views anonymously from the BaseView,
+ * and build the selected view.
+ */
 import com.freedompay.controllers.*;
 import com.freedompay.models.FileModel;
 

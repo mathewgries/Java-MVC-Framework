@@ -17,13 +17,13 @@ import com.freedompay.controllers.Controller;
 
 public class MatchedRowsView extends View {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1629215632273169120L;
 	
 	private Controller controller;
 	
+	/**
+	 * <p>Add the MatchedRowsController</p>
+	 */
 	@Override
 	public void addController(Controller c) {
 		controller = c;
@@ -36,6 +36,9 @@ public class MatchedRowsView extends View {
 
 //==========================================================================================
 		
+	/**
+	 * <p>Build the view</p>
+	 */
 	@Override
 	public void build() {
 		Border bevel = BorderFactory.createLoweredBevelBorder();
@@ -55,6 +58,12 @@ public class MatchedRowsView extends View {
 	
 	private JPanel leftPanel;
 	
+	/**
+	 * <p>
+	 * The left panel holds the decision buttons for switching table views,
+	 * as well as the File name list, and matched headers table
+	 * </p>
+	 */
 	private void buildLeftDivider() {
 		this.leftPanel = new JPanel();		
 		
@@ -79,6 +88,13 @@ public class MatchedRowsView extends View {
 	
 	//------------------ Uploaded File List --------------------------
 
+	/**
+	 * <p>
+	 * The scene panel holds the file name list, and the matched headers table
+	 * It is added to the left panel
+	 * </p>
+	 * @return scene panel
+	 */
 	private JPanel buildScenePanel() {
 		JPanel scene = new JPanel();
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
@@ -100,6 +116,10 @@ public class MatchedRowsView extends View {
 		return scene;
 	}
 	
+	/**
+	 * <p>The buttons for switching the table view</p>
+	 * @return The button panel
+	 */
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
@@ -132,7 +152,7 @@ public class MatchedRowsView extends View {
 	
 	/**
 	 * <p>
-	 * The JPanel to hold the JPanel for the invalid rows table
+	 * The right panel to hold the JPanel for the matched rows table
 	 * </p>
 	 */
 	private void buildRightDivider() {
@@ -153,7 +173,7 @@ public class MatchedRowsView extends View {
 	
 	/**
 	 * <p>
-	 * The JPanel to hold the invalid rows table
+	 * The JPanel to hold the matched rows, duplicated rows, and unmatched rows table data
 	 * </p>
 	 * @return
 	 */

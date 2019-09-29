@@ -18,6 +18,8 @@ public class Program {
 		 */
 		
 		// Sets up the size values for the JFrame
+		// Configure is global. Add global configs to that
+		// class file, and you can initialize them here.
 		Configure.setConfigurations();
 		
 		// RouteConfig sets up the routing for the app
@@ -34,6 +36,7 @@ public class Program {
 		router.addObserver(baseView);
 		menu.addObserver(router);
 		baseView.init(menu);
+		// Default the start up View to HomeView
 		router.update("Home");
 		router.addObserver(menu);
 		

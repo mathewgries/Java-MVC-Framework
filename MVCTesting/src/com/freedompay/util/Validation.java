@@ -9,6 +9,9 @@ import java.util.List;
 
 /**
  * <p>
+ * THIS CLASS IS NOT CURRENTLY IN USE. WE WILL HOLD THIS HERE FOR LEGACY
+ * REASONS AND POSSIBLE FUTURE ADDITION TO THE APPLICATION.
+ * 
  * Static validation class for validating files and field values
  * </p>
  * @author MGries
