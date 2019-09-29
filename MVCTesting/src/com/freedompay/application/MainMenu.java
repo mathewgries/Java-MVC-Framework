@@ -9,9 +9,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
 
-//TODO: Figure out how to set the focus on the nav links based on the 
-// current view state.
-
 /**
  * <p>
  * This is the navigation menu. It works like a nav menu on a website
@@ -32,6 +29,7 @@ public class MainMenu extends JMenuBar implements IRouteService, IRouteListener,
 	private JButton matchedRowsBtn;
 	private JButton exitBtn;
 	
+	// observer methods
 	public void addObserver(IRouteListener obj) {
 		this.observers.add(obj);
 	}

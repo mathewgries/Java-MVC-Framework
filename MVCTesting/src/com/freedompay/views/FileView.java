@@ -14,12 +14,24 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
+/**
+ * <p>
+ * View for File selection. Lets the user upload files,
+ * and select the header columns they want to compare
+ * each file against.
+ * </p>
+ * @author MGries
+ *
+ */
 public class FileView extends View {
 
 	private static final long serialVersionUID = -794968485917811795L;
 
 	private Controller controller;
 	
+	/**
+	 * <p>The controller for the view</p>
+	 */
 	@Override
 	public void addController(Controller c) {
 		controller = c;
@@ -31,6 +43,9 @@ public class FileView extends View {
 
 //==========================================================================================
 	
+	/**
+	 * <p>Build out the view</p>
+	 */
 	@Override
 	public void build() {
 		Border bevel = BorderFactory.createLoweredBevelBorder();
@@ -48,8 +63,16 @@ public class FileView extends View {
 
 //==========================================================================================
 	
+	
 	private JPanel leftPanel;
 	
+	/**
+	 * <p>
+	 * The left panel holds all user controls
+	 * This includes buttons, and file lists.
+	 * The MatchedHeaderTable will also be here
+	 * </p>
+	 */
 	private void buildLeftDivider() {
 		this.leftPanel = new JPanel();		
 		
@@ -74,6 +97,13 @@ public class FileView extends View {
 	
 	//------------------ Uploaded File List --------------------------
 
+	/**
+	 * <p>
+	 * The scene panel will added to the left panel.
+	 * This will hold the file list, and match table
+	 * </p>
+	 * @return
+	 */
 	private JPanel buildScenePanel() {
 		JPanel scene = new JPanel();
 		JLabel fileLabel = this.controller.getJLabel("Uploaded Files"); 
@@ -95,6 +125,14 @@ public class FileView extends View {
 		return scene;
 	}
 	
+	/**
+	 * <p>
+	 * Button Panel to hold the buttons for selecting
+	 * files, deleting files, clearing cell values
+	 * and navigating to the MatchedRowsView
+	 * </p>
+	 * @return
+	 */
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
@@ -103,14 +141,14 @@ public class FileView extends View {
 		JButton capturedBtn = this.controller.getCapturedBtn();
 		JButton deleteFileBtn = this.controller.getDeleteFileBtn();
 		JButton clearBtn = this.controller.getClearCellBtn();
-		JButton checkErrorsBtn = this.controller.getInvalidRowsBtn();
+		JButton matchedRowsBtn = this.controller.getMatchedRowsBtn();
 	
 		p.add(posBtn);
 		p.add(unCapturedBtn);
 		p.add(capturedBtn);
 		p.add(deleteFileBtn);
 		p.add(clearBtn);
-		p.add(checkErrorsBtn);
+		p.add(matchedRowsBtn);
 		
 		return p;
 	}
@@ -125,6 +163,12 @@ public class FileView extends View {
 	
 	//-------------- Main panel for scene and story panel ---------
 	
+	/**
+	 * <p>
+	 * The right panel will hold the header selection lists
+	 * for the non POS files.
+	 * </p>
+	 */
 	private void buildRightDivider() {
 		this.rightPanel = new JPanel();
 		this.rightPanel.setLayout(new BoxLayout(this.rightPanel, BoxLayout.PAGE_AXIS));
@@ -141,6 +185,11 @@ public class FileView extends View {
 
 	//--------------- Show invalid lines for files -------------------
 	
+	/*
+	 * <p>
+	 * The header selection lists. Added to the right panel
+	 * </p>
+	 */
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
 		JPanel uncaptured = this.controller.getUncapturedHeaderList();

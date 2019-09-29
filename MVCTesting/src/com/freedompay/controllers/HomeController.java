@@ -5,6 +5,8 @@ import javax.swing.JTextArea;
 /**
  * <p>
  * Controller for the HomeView class
+ * This will set the instructions for the application,
+ * and the welcome message.
  * </p>
  * @author MGries
  *
@@ -13,7 +15,9 @@ public class HomeController extends Controller {
 	
 	//--------------- PAGE INSTRUCTIONS ---------------------
 	
-	// Page instruction area
+	/**
+	 * <p>Instructions for using the application</p>
+	 */
 	private String instructions = "WELCOME TO THE FREEDOMPAY RECONCILIATION APP\n\n"+
 			"App instructions are lsited below. To get started, select the \"Files\" tab in the menu\n"+
 			"You can return to the home screen at anytime to review the instructions by clicking\n"+
@@ -26,12 +30,16 @@ public class HomeController extends Controller {
 			" against the other uploaded files";
 	
 	
-	// Load instructions
+	/**
+	 * <p>Loads the instructions to the view</p>
+	 */
 	public String getInstructions() {
 		return this.instructions;
 	}
 	
-	// Instructions container
+	/**
+	 * <p>The container where the isntructions will appear</p>
+	 */
 	public JTextArea getTextArea(String txt) {
 		JTextArea t = new JTextArea(txt);
 		t.setLineWrap(true);
@@ -39,6 +47,9 @@ public class HomeController extends Controller {
 		return t;
 	}
 
+	/**
+	 * <p>Basic page label</p>
+	 */
 	public JLabel getJLabel(String txt) {
 		return new JLabel(txt);
 	}

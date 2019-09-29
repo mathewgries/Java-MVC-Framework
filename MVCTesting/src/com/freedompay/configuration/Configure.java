@@ -8,8 +8,9 @@ import java.awt.Toolkit;
 
 /**
  * <p>
- * Basic application configurations.
+ * Global application configurations.
  * Gets the Viewport dimensions from the system
+ * Add any global configurations for your app here
  * </p>
  * @author MGries
  *
@@ -19,15 +20,29 @@ public class Configure {
 	private static int viewWidth;
 	private static int viewHeight;
 	
+	/**
+	 * <p>
+	 * Init method called on application start
+	 * Currently sets the application window to fullscreen
+	 * </p>
+	 */
 	public static void setConfigurations() {
 		viewWidth = (int) getScreenViewableBounds().getWidth();
 		viewHeight = (int) getScreenViewableBounds().getHeight();
 	}
 	
+	/**
+	 * <p>Returns the window width</p>
+	 * @return
+	 */
 	public static int getVPWidth() {
 		return viewWidth;
 	}
 
+	/**
+	 * <p>Returns the window height</p>
+	 * @return
+	 */
 	public static int getVPHeight() {
 		return viewHeight;	
 	}

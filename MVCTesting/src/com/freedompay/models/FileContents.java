@@ -88,9 +88,9 @@ public class FileContents {
 	 */
 	public String fileRowsToString() {
 		String result = "";
-		for(int i = 0; i < this.fileRows.size(); i++) {
-			for(int j = 0; j < this.fileRows.get(i).size(); j++) {
-				result += this.fileRows.get(i).get(j) + ", ";
+		for(ArrayList<String> row : this.fileRows) {
+			for(String col : row) {
+				result += col + ", ";
 			}
 			result += "\n";
 		}
@@ -115,6 +115,9 @@ public class FileContents {
 		return this.headerNames;
 	}
 	
+	/**
+	 * <p>Set the index for the requestId column position</p>
+	 */
 	private void setRequestId() {
 		int index = 0;
 		for(String header : this.getHeaderNames()) {
@@ -125,10 +128,16 @@ public class FileContents {
 		}
 	}
 	
+	/**
+	 * @return Get the index for the requestId column position
+	 */
 	public int getRequestIdPos() {
 		return this.requestIdPos;
 	}
 	
+	/**
+	 * @return List of requestIds
+	 */
 	public List<String> getRequestIds(){
 		List<String> requestIds = new ArrayList<String>();
 		for(ArrayList<String> row : this.fileRows) {
@@ -189,21 +198,21 @@ public class FileContents {
 	 */
 	public List<Integer> getHeadersIndexes(){
 		List<Integer> indexes = new ArrayList<Integer>();
-		// Loop through all file headers
-		for(int i = 0; i < this.headerNames.size(); i++) {
-			// Pull out the header value
-			String header = this.headerNames.get(i);
-			// Loop through the selected header list
-			for(int j = 0; j < this.selectedHeaders.size(); j++) {
-				// When a match is found, store the index from the main list
-				if(header.equalsIgnoreCase(this.selectedHeaders.get(j))) {
-					indexes.add(i);
-				}
+		int index = 0;
+		for(String header : this.headerNames) {
+			if(this.selectedHeaders.contains(header)) {
+				indexes.add(index);
 			}
+			index++;
 		}
 		return indexes;
 	}
 	
+	/**
+	 * <p>Get the index of given header</p>
+	 * @param h the header to search for
+	 * @return The index position of the header
+	 */
 	public Integer getHeaderIndex(String h){
 		Integer index = 0;
 		for(String header: this.headerNames) {
@@ -238,6 +247,7 @@ public class FileContents {
 	 */
 	public List<ArrayList<Integer>> initInvalidRowIntegers() {
 		this.invalidRowIntegers = new ArrayList<ArrayList<Integer>>();
+
 		for(int i = 0; i < this.getRowCount(); i++) {
 			this.invalidRowIntegers.add(new ArrayList<Integer>());
 			this.invalidRowIntegers.get(i).add(i);
@@ -263,9 +273,9 @@ public class FileContents {
 	 */
 	public String invalidRowIntegersToString() {
 		String result = "";
-		for(int i = 0; i < this.invalidRowIntegers.size(); i++) {
-			for(int j = 0; j < this.invalidRowIntegers.get(i).size(); j++) {
-				result += this.invalidRowIntegers.get(i).get(j) + ", ";
+		for(ArrayList<Integer> row : this.invalidRowIntegers) {
+			for(Integer col : row) {
+				result += col + ", ";
 			}
 			result += "\n";
 		}
