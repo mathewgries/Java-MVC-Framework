@@ -4,11 +4,7 @@ import com.freedompay.services.IRouteListener;
 import java.awt.Dimension;
 import javax.swing.*;
 
-/**
- * 
- * @author MGries
- *
- */
+
 public class BaseView extends JFrame implements IRouteListener {
 	
 	private static final long serialVersionUID = -209583737245413832L;
