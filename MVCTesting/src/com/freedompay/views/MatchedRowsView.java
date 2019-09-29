@@ -159,7 +159,7 @@ public class MatchedRowsView extends View {
 	 */
 	private JPanel buildStoryPanel() {
 		JPanel story = new JPanel();
-		JLabel label = this.controller.getJLabel("Invalid File Lines");
+		JLabel label = this.controller.getJLabel("Comparison Tables");
 		JScrollPane compareResults = this.controller.getComparisonResultsTable();
 		story.setLayout(new BoxLayout(story, BoxLayout.PAGE_AXIS));
 		

@@ -43,21 +43,38 @@ public class Comparison {
 	
 	public static void runComparison() {
 		List<FileModel> models = FileData.getAllFileModels();
-		
-		Comparison.uncapturedLoaded = false;
-		ComponentData.setMatchedUncapturedBtnIsEnabled(false);
-		ComponentData.setDuplicateUncapturedBtnIsEnabled(false);
-		
-		Comparison.capturedLoaded = false;
-		ComponentData.setMatchedCapturedBtnIsEnabled(false);
-		ComponentData.setDuplicateCapturedBtnIsEnabled(false);
-		
+		Comparison.resetLists();
 		Comparison.setLoadedFlags(models);
 		Comparison.loadMatchedHeadersList();
 		Comparison.initMatchedIndexes();
 		Comparison.initFileRows();
 		Comparison.intiFileCompare();
 		Comparison.finalizeNoMatchList();
+	}
+	
+	private static void resetLists() {
+		Comparison.uncapturedLoaded = false;
+		ComponentData.setMatchedUncapturedBtnIsEnabled(false);
+		ComponentData.setDuplicateUncapturedBtnIsEnabled(false);
+		Comparison.capturedLoaded = false;
+		ComponentData.setMatchedCapturedBtnIsEnabled(false);
+		ComponentData.setDuplicateCapturedBtnIsEnabled(false);
+		matchedHeadersList = null;
+		uncapturedLoaded = false;
+		matchedHeadersUncapturedIndexes = null;
+		uncapturedRows = null;
+		posForUncaptured = null;
+		matchedRowsUncapturedIndexes = null;
+		duplicateRowsUncapturedIndexes = null;
+		noUncapturedMatchIndexes = null;
+		capturedLoaded = false;
+		matchedHeadersCapturedIndexes = null;
+		capturedRows = null;
+		posForCaptured = null;
+		matchedRowsCapturedIndexes = null;
+		duplicateRowsCapturedIndexes = null;
+		noCapturedMatchIndexes = null;
+		noMatches = null;
 	}
 	
 //======================================================================================

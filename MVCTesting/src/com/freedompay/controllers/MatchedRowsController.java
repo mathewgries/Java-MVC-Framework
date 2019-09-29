@@ -191,12 +191,13 @@ public class MatchedRowsController extends Controller{
 	 * </p>
 	 */
 	public JScrollPane getComparisonResultsTable() {
-		this.comparisonResultsTable = new JTable(this.comparisonResultsTableModel) {
-			private static final long serialVersionUID = 1L;
-			public boolean isCellEditable(int row, int col) {
-				return false;
-			}
-		};
+		this.comparisonResultsTable = new JTable(this.comparisonResultsTableModel);
+//		{
+//			private static final long serialVersionUID = 1L;
+//			public boolean isCellEditable(int row, int col) {
+//				return false;
+//			}
+//		};
 		this.comparisonResultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF );
 		this.tableSP = new JScrollPane(this.comparisonResultsTable);
 		this.tableSP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
