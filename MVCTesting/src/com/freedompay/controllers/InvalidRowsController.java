@@ -23,6 +23,9 @@ import com.freedompay.util.ErrorType;
 import com.freedompay.views.View;
 
 /**
+ * THIS VIEW IS CURRENTLY NOT IN USE. IT IS HERE FOR LEGACY PURPOSES
+ * AND POSSIBLY ADDING BACK IN AT SOME POINT IF DEEMED NECESSARY
+ * 
  * Controller for InvalidRowsView. Sets up the Table Views to display
  * the rows from each file that have invalid data for matching.
  * @author MGries
@@ -51,9 +54,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	}
 	
 	/**
-	 * <p>
-	 * Add the view to the controller
-	 * </p>
+	 * <p>Add the view to the controller</p>
 	 */
 	@Override
 	public void addView(View v) {
@@ -72,24 +73,20 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	
 	//-------------- ADD and REMOVE FILES BUTTONS ----------------
 	
-	private JButton compareBtn;
+	private JButton matchedRowsBtn;
 	private JButton backBtn;
 	
 	/**
-	 * <p>
-	 * Button to change the view to the MatchedRowsView
-	 * </p>
+	 * <p>Button to change the view to the MatchedRowsView</p>
 	 */
-	public JButton getCompareBtn() {
-		this.compareBtn = new JButton("Compare Files");
-		this.compareBtn.addActionListener(this);
-		return this.compareBtn;
+	public JButton getMatchedRowsBtn() {
+		this.matchedRowsBtn = new JButton("Compare Files");
+		this.matchedRowsBtn.addActionListener(this);
+		return this.matchedRowsBtn;
 	}
 	
 	/**
-	 * <p>
-	 * Button to change the view back to the Files view.
-	 * </p>
+	 * <p>Button to change the view back to the Files view.</p>
 	 */
 	public JButton getBackBtn() {
 		this.backBtn = new JButton("Back To Files");
@@ -107,7 +104,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	 */
 	public void actionPerformed(ActionEvent e) {
 		
-		if(e.getSource() == compareBtn) {
+		if(e.getSource() == matchedRowsBtn) {
 			this.notifyObservers("MatchedRows");
 		}
 		
@@ -129,9 +126,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	private JScrollPane fileNameListContainer;
 	
 	/**
-	 * <p>
-	 * Load the file name list to the View.
-	 * </p>
+	 * <p>Load the file name list to the View.</p>
 	 */
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
@@ -143,9 +138,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	}
 		
 	/**
-	 * <p>
-	 * Get the file names to load to the list for the View
-	 * </p>
+	 * <p>Get the file names to load to the list for the View</p>
 	 */
 	private DefaultListModel<String> loadFileNames(){
 		this.fileNamesListModel.clear();
@@ -175,9 +168,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	}
 	
 	/**
-	 * <p>
-	 * Get the data for the matched headers table.
-	 * </p>
+	 * <p>Get the data for the matched headers table.</p>
 	 * @return
 	 */
 	private DefaultTableModel loadMatchedHeadersTableModel() {
@@ -198,9 +189,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	private  List<ArrayList<Integer>> errorIntegers = null;
 	
 	/**
-	 * <p>
-	 * Load the invalid rows from the file selected in the FileNames list
-	 * </p>
+	 * <p>Load the invalid rows from the file selected in the FileNames list</p>
 	 */
 	public JScrollPane getInvalidRowsList() {
 		this.invalidLinesTable = new JTable(this.invalidModel);
@@ -227,9 +216,7 @@ public class InvalidRowsController extends Controller implements ListSelectionLi
 	}
 	
 	/**
-	 * <p>
-	 * Update the view when a file is selected in the Filename list.
-	 * </p>
+	 * <p>Update the view when a file is selected in the Filename list.</p>
 	 * @param filename the file selected in the list
 	 */
 	private void updateInvalidModel(String filename) {

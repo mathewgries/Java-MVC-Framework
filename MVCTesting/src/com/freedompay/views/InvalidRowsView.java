@@ -16,6 +16,9 @@ import com.freedompay.controllers.Controller;
 
 /**
  * <p>
+ * THIS FILE IS NOT CURRENTLY IN USE. WE WILL LEAVE THIS HERE FOR 
+ * POSSIBLE FUTURE USE AND LEGACY PURPOSES.
+ * 
  * The View for the InvalidRows.
  * </p>
  * @author MGries
@@ -135,10 +138,10 @@ public class InvalidRowsView extends View {
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(3,2));
 		
-		JButton compareBtn = this.controller.getCompareBtn();
+		JButton matchedRowsBtn = this.controller.getMatchedRowsBtn();
 		JButton backBtn = this.controller.getBackBtn();
 		
-		p.add(compareBtn);
+		p.add(matchedRowsBtn);
 		p.add(backBtn);
 		return p;
 	}

@@ -15,6 +15,8 @@ import com.freedompay.models.FileModel;
  */
 public class Comparison {
 	
+	// The list for holding data on the comparisons
+	// There is a different set for each file type - Uncaptured and Captured
 	private static List<ArrayList<String>> matchedHeadersList = null;
 	
 	private static boolean uncapturedLoaded = false;
@@ -41,6 +43,12 @@ public class Comparison {
 
 //======================================================================================
 	
+	/**
+	 * <p>
+	 * This is the main method for running comparisons. All other methods
+	 * will be called from here.
+	 * </p>
+	 */
 	public static void runComparison() {
 		List<FileModel> models = FileData.getAllFileModels();
 		Comparison.resetLists();
@@ -52,6 +60,14 @@ public class Comparison {
 		Comparison.finalizeNoMatchList();
 	}
 	
+	/**
+	 * <p>
+	 * This method resets all the lists and values back to a default state.
+	 * This is done for when the view is switched. We want to reinitialize the data
+	 * incase there are any changes to the files, or column selections when switching
+	 * back to this view.
+	 * </p>
+	 */
 	private static void resetLists() {
 		Comparison.uncapturedLoaded = false;
 		ComponentData.setMatchedUncapturedBtnIsEnabled(false);
@@ -85,26 +101,41 @@ public class Comparison {
 	
 	//--------------------------- UNCAPTURED LISTS -------------------------------
 	
+	/**
+	 * @return The matched indexes from POS file and Uncaptured file
+	 */
 	public static List<ArrayList<Integer>> getMatchedRowsUncapturedIndexes(){
 		return Comparison.matchedRowsUncapturedIndexes;
 	}
 	
+	/**
+	 * @return The duplicated list for POS on Uncaptured file
+	 */
 	public static List<ArrayList<Integer>> getDuplicateRowsUncapturedIndexes(){
 		return Comparison.duplicateRowsUncapturedIndexes;
 	}
 	
 	//----------------------------- CAPTURED LISTS ---------------------------------
 	
+	/**
+	 * @return The matched indexes from POS file and Captured file
+	 */
 	public static List<ArrayList<Integer>> getMatchedRowsCapturedIndexes(){
 		return Comparison.matchedRowsCapturedIndexes;
 	}
 	
+	/**
+	 * @return The duplicated list for POS on Captured file
+	 */
 	public static List<ArrayList<Integer>> getDuplicateRowsCapturedIndexes(){
 		return Comparison.duplicateRowsCapturedIndexes;
 	}
 	
 	//---------------------------- NO MATCHES LIST --------------------------------------
 	
+	/**
+	 * @return The list of unmatched rows from POS file
+	 */
 	public static List<Integer> getNoMatches(){
 		return Comparison.noMatches;
 	}
@@ -259,6 +290,15 @@ public class Comparison {
 
 //======================================================================================
 
+	/**
+	 * <p>
+	 * Compare the POS files to the uploaded files
+	 * We will initialize the proper lists where needed,
+	 * and run the comparisons on the files based on whether
+	 * the boolean values are set to true for the file being
+	 * ready to be compared.
+	 * </p>
+	 */
 	private static void intiFileCompare() {
 		if(Comparison.uncapturedLoaded) {
 			Comparison.matchedRowsUncapturedIndexes = new ArrayList<ArrayList<Integer>>();
@@ -274,6 +314,14 @@ public class Comparison {
 		}
 	}
 	
+	/**
+	 * <p>Compares the POS file against the selected file based on the list types for files passed in as args</p>
+	 * @param posRows The POS file rows based on selected match columns for the give file type being matched on
+	 * @param toSearchRows The rows for the file being matched against, with only the columns selected in header match up
+	 * @param indexesToSet The list to set the matched indexes to
+	 * @param dups If duplicate matches are found, POS row index is set, as well as all matched indexes from given file
+	 * @param noMatch If no match is found, the POS row index is added to the noMatch list
+	 */
 	private static void setMatchedRows(List<ArrayList<String>> posRows, List<ArrayList<String>> toSearchRows, List<ArrayList<Integer>> indexesToSet, List<ArrayList<Integer>> dups, List<Integer> noMatch) {
 		int posRowIndex = -1;
 		int searchRowIndex = -1;
@@ -314,6 +362,14 @@ public class Comparison {
 
 //======================================================================================
 	
+	/**
+	 * <p>
+	 * No match list will only contain POS indexes for rows not matched on BOTH files.
+	 * If only one file was uploaded or ran against, set no match to the given list.
+	 * If both files are loaded, add to the no match list only POS row indexes that 
+	 * appear in both lists for no matches on each file.
+	 * </p>
+	 */
 	private static void finalizeNoMatchList() {
 		
 		if(Comparison.uncapturedLoaded && Comparison.capturedLoaded) {

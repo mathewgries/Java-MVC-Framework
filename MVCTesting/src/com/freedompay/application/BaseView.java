@@ -4,18 +4,33 @@ import com.freedompay.services.IRouteListener;
 import java.awt.Dimension;
 import javax.swing.*;
 
-
+/*
+ * This class is the JFrame for the whole application.
+ * All JPanels/Views are added or removed to this JFrame
+ * during route updates.
+ */
 public class BaseView extends JFrame implements IRouteListener {
 	
 	private static final long serialVersionUID = -209583737245413832L;
 	
+	// MainMenu is where the navigation buttons are placed
 	private MainMenu menu;
+	// The view for the current route
 	private View view = null;
 	
+	/**
+	 * <p>Initialize the MainMenu to the JFrame on start up</p>
+	 * @param mm MainMenu object
+	 */
 	public void init(MainMenu mm) {
 		menu = mm;
 	}
 	
+	/**
+	 * Set up the JFrame on start up with basic configurations
+	 * @param w Width of the JFrame
+	 * @param h Height of the JFrame
+	 */
 	public void createAndShowGUI(int w, int h) {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setTitle("MGries Java MVC Framework");
@@ -30,6 +45,11 @@ public class BaseView extends JFrame implements IRouteListener {
 		this.setVisible(true);
 	}
 
+	/**
+	 * <p>
+	 * Remove previous view, if exists, and add new view
+	 * </p>
+	 */
 	@Override
 	public void update(Object obj) {
 		if(this.view != null) {

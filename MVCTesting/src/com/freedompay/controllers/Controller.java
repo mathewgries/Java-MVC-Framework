@@ -81,7 +81,7 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 
 	public JButton getBackBtn() {return null;}
 	
-	public JButton getCompareBtn() {return null;}
+	public JButton getMatchedRowsBtn() {return null;}
 	
 	public JButton getMatchedUncapturedBtn() {return null;}
 	

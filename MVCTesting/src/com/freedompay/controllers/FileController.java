@@ -64,6 +64,14 @@ public class FileController extends Controller  {
 	
 	// --------- ADD THE VIEW --------------------------
 	
+	/**
+	 * <p>
+	 * Adds a reference of the view. Not always needed
+	 * unless you are calling on the view for some reason.
+	 * In this case, we are using it to set the parent component
+	 * of the FileOpenDialog box.
+	 * </p>
+	 */
 	@Override
 	public void addView(View v) {
 		view = v;
@@ -87,7 +95,7 @@ public class FileController extends Controller  {
 	private JButton capturedBtn;
 	private JButton deleteFileBtn;
 	private JButton clearBtn;
-	private JButton invalidRowsBtn;
+	private JButton matchedRowsBtn;
 	
 	//When a file is picked..., 
 	
@@ -142,16 +150,22 @@ public class FileController extends Controller  {
 	/**
 	 * <p>Load File Validation Button to View</p>
 	 */
-	public JButton getInvalidRowsBtn() {
-		this.invalidRowsBtn = new JButton("Matched Rows");
-		this.invalidRowsBtn.addActionListener(this);
-		return this.invalidRowsBtn;
+	public JButton getMatchedRowsBtn() {
+		this.matchedRowsBtn = new JButton("Matched Rows");
+		this.matchedRowsBtn.addActionListener(this);
+		return this.matchedRowsBtn;
 	}
 	
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 	
 	/**
-	 * <p>Event Listener for the button clicks</p>
+	 * <p>
+	 * Event Listener for the button clicks
+	 * Mostly we are calling the FileChooser, and setting
+	 * the file type from the button used to open it.
+	 * We are also clearing cells from the match table, as well
+	 * as changing the route for matched rows view.
+	 * </p>
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == posBtn) {
@@ -192,7 +206,7 @@ public class FileController extends Controller  {
 			}
 		}
 		
-		if(e.getSource() == invalidRowsBtn) {
+		if(e.getSource() == matchedRowsBtn) {
 			if(!FileData.getIsPOSLoadedFlag()) {
 				UserMessages.noPOSFilePresent();
 			}else if(FileData.getFileCount() < 2) {
@@ -205,6 +219,14 @@ public class FileController extends Controller  {
 		}
 	}
 	
+	/**
+	 * <p>
+	 * Validating that enough header matches have been selected
+	 * from at least one of the uploaded files.
+	 * </p>
+	 * @param type The file type to check against
+	 * @return boolean
+	 */
 	private boolean validateHeaderCount(FileType type) {
 		int count = 0;
 		int col = 0;
@@ -356,9 +378,8 @@ public class FileController extends Controller  {
 	 */
 	private DefaultListModel<String> loadFileNames(){
 		this.fileNamesListModel.clear();
-		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
-		while(i.hasNext()) {
-			this.fileNamesListModel.addElement((String)i.next().getName());
+		for(FileModel model : FileData.getAllFileModels()) {
+			this.fileNamesListModel.addElement(model.getName());
 		}
 		return this.fileNamesListModel;
 	}
@@ -416,10 +437,8 @@ public class FileController extends Controller  {
 	 */
 	private DefaultListModel<String> loadUncapturedHeaders(){
 		if(FileData.getFileModel(FileType.UNCAPTURED_AUTH) != null) {
-			FileModel model = FileData.getFileModel(FileType.UNCAPTURED_AUTH);
-			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
-			while(headers.hasNext()) {
-				this.uncapturedHeaderModel.addElement(headers.next());
+			for(String header : FileData.getFileModel(FileType.UNCAPTURED_AUTH).getFileContents().getHeaderNames()) {
+				this.uncapturedHeaderModel.addElement(header);
 			}
 		}else {
 			this.uncapturedHeaderModel.clear();
@@ -476,10 +495,8 @@ public class FileController extends Controller  {
 	 */
 	private DefaultListModel<String> loadCapturedHeaders(){
 		if(FileData.getFileModel(FileType.CAPTURED) != null) {
-			FileModel model = FileData.getFileModel(FileType.CAPTURED);
-			Iterator<String> headers = model.getFileContents().getHeaderNames().iterator();
-			while(headers.hasNext()) {
-				this.capturedHeaderModel.addElement(headers.next());
+			for(String header :  FileData.getFileModel(FileType.CAPTURED).getFileContents().getHeaderNames()) {
+				this.capturedHeaderModel.addElement(header);
 			}
 		}else {
 			this.capturedHeaderModel.clear();
@@ -534,8 +551,7 @@ public class FileController extends Controller  {
 	private void setPOSHeadersToTable() {
 		this.selectedRow = -1;
 		if(FileData.getFileModel(FileType.POS) != null) {
-			FileModel posModel = FileData.getFileModel(FileType.POS);
-			ColumnData.setPOSHeadersToTableData(posModel.getFileContents().getHeaderNames());
+			ColumnData.setPOSHeadersToTableData(FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames());
 		}else {
 			ColumnData.getTableData().setRowCount(0);
 		}

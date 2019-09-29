@@ -20,23 +20,42 @@ import com.freedompay.util.Comparison;
 import com.freedompay.util.FileType;
 import com.freedompay.views.View;
 
+
+/**
+ * <p>
+ * This view is where the user can view the rows where matches were found
+ * They can also see rows where multiple matches were found, and rows
+ * where no matches were found.
+ * </p>
+ * @author MGries
+ *
+ */
 public class MatchedRowsController extends Controller{
 
 	private View view;
 	
 	// ------------ OBSERVER METHODS ----------------------------
 	
+	// The list of observers for the controller -- RouteConfig
 	private List<IRouteListener> observers = new ArrayList<IRouteListener>();
 	
-	// The RouteConfig is the observer
+	/**
+	 * <p>Add the observers</p>
+	 */
 	public void addObserver(IRouteListener obj) {
 		this.observers.add(obj);
 	}
 	
+	/**
+	 * <p>Remove the observers</p>
+	 */
 	public void removeObserver(IRouteListener obj) {
 		this.observers.remove(obj);
 	}
 	
+	/**
+	 * <p>Notify the observers</p>
+	 */
 	@Override
 	public void notifyObservers(Object obj) {
 		for(IRouteListener rs : observers) {
@@ -46,11 +65,17 @@ public class MatchedRowsController extends Controller{
 	
 	// --------- ADD THE VIEW --------------------------
 	
+	/**
+	 * <p>Add the MatchedRowsView</p>
+	 */
 	@Override
 	public void addView(View v) {
 		view = v;
 	}
 	
+	/**
+	 * <p>Basic label for the view</p>
+	 */
 	public JLabel getJLabel(String txt) {
 		return new JLabel(txt);
 	}
@@ -71,6 +96,9 @@ public class MatchedRowsController extends Controller{
 	private JButton noMatchBtn;
 	private JButton backBtn;
 	
+	/**
+	 * <p>Button to view matched rows from Uncaptured file</p>
+	 */
 	public JButton getMatchedUncapturedBtn() {
 		this.matchedUncapturedBtn = new JButton("Matched Uncaptured Auth");
 		this.matchedUncapturedBtn.addActionListener(this);
@@ -78,6 +106,9 @@ public class MatchedRowsController extends Controller{
 		return this.matchedUncapturedBtn;
 	}
 	
+	/**
+	 * <p>Button to view matched rows from Captured file</p>
+	 */
 	public JButton getMatchedCapturedBtn() {
 		this.matchedCapturedBtn = new JButton("Matched Captured");
 		this.matchedCapturedBtn.addActionListener(this);
@@ -85,6 +116,9 @@ public class MatchedRowsController extends Controller{
 		return this.matchedCapturedBtn;
 	}
 	
+	/**
+	 * <p>Button to view duplicate matches from Uncaptured file</p>
+	 */
 	public JButton getDuplicateUncapturedBtn() {
 		this.duplicateUncapturedBtn = new JButton("Duplicate Uncaptured Matches");
 		this.duplicateUncapturedBtn.addActionListener(this);
@@ -92,6 +126,9 @@ public class MatchedRowsController extends Controller{
 		return this.duplicateUncapturedBtn;
 	}
 	
+	/**
+	 * <p>Button to view duplicate matches from Captured file</p>
+	 */
 	public JButton getDuplicateCapturedBtn() {
 		this.duplicateCapturedBtn = new JButton("Duplicate Captured Matches");
 		this.duplicateCapturedBtn.addActionListener(this);
@@ -99,12 +136,18 @@ public class MatchedRowsController extends Controller{
 		return this.duplicateCapturedBtn;
 	}
 	
+	/**
+	 * <p>Button to view rows with now matches</p>
+	 */
 	public JButton getNoMatchBtn() {
 		this.noMatchBtn = new JButton("Not Matched");
 		this.noMatchBtn.addActionListener(this);
 		return this.noMatchBtn;
 	}
 	
+	/**
+	 * <p>Button to return to the FilesView</p>
+	 */
 	public JButton getBackBtn() {
 		this.backBtn = new JButton("Back To Files");
 		this.backBtn.addActionListener(this);
@@ -113,11 +156,16 @@ public class MatchedRowsController extends Controller{
 
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 
+	/**
+	 * <p>Action event handler for the buttons</p>
+	 */
 	public void actionPerformed(ActionEvent e) {
 		
+		// Go back to FilesView
 		if(e.getSource() == backBtn) {
 			this.notifyObservers("Files");
 		}else {
+			// Update the table view
 			this.updateComparisonResultsTableModel(e);
 		}
 	}
@@ -135,7 +183,9 @@ public class MatchedRowsController extends Controller{
 	private JScrollPane fileNameListContainer;
 	
 	
-	// Display uploaded file names in a JList
+	/**
+	 * <p>List of names for uploaded files</p>
+	 */
 	public JScrollPane getFileNameList() {
 		this.displayFileNames = new JList<String>(this.loadFileNames());
 		this.displayFileNames.setEnabled(false);
@@ -144,7 +194,10 @@ public class MatchedRowsController extends Controller{
 		return this.fileNameListContainer;
 	}
 	
-	// Load existing files when navigating back to the page
+	/**
+	 * <p>Load file names to the list</p>
+	 * @return File names list
+	 */
 	private DefaultListModel<String> loadFileNames(){
 		this.fileNamesListModel.clear();
 		Iterator<FileModel> i = FileData.getAllFileModels().iterator();
@@ -159,6 +212,9 @@ public class MatchedRowsController extends Controller{
 	private JTable matchedHeadersTable = null;
 	private JScrollPane matchedHeadersScrollPane;
 	
+	/**
+	 * <p>The matched headers table</p>
+	 */
 	public JScrollPane getMatchedHeadersTable() {
 		this.matchedHeadersTable = new JTable(this.loadMatchedHeadersTableModel()) {
 			private static final long serialVersionUID = 5467279387896919490L;
@@ -171,6 +227,10 @@ public class MatchedRowsController extends Controller{
 		return this.matchedHeadersScrollPane;
 	}
 	
+	/**
+	 * <p>Load the matched headers data to the table</p>
+	 * @return MatchedHeadersTable data
+	 */
 	private DefaultTableModel loadMatchedHeadersTableModel() {
 		return ColumnData.getTableData();
 	}
@@ -187,17 +247,12 @@ public class MatchedRowsController extends Controller{
 	
 	/**
 	 * <p>
-	 * Load the invalid rows from the file selected in the FileNames list
+	 * Load the selected file data. Matched rows, duplicated rows, and unmatched rows.
+	 * This table is updated depending on the button selected by the user.
 	 * </p>
 	 */
 	public JScrollPane getComparisonResultsTable() {
 		this.comparisonResultsTable = new JTable(this.comparisonResultsTableModel);
-//		{
-//			private static final long serialVersionUID = 1L;
-//			public boolean isCellEditable(int row, int col) {
-//				return false;
-//			}
-//		};
 		this.comparisonResultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF );
 		this.tableSP = new JScrollPane(this.comparisonResultsTable);
 		this.tableSP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -205,6 +260,13 @@ public class MatchedRowsController extends Controller{
 		return this.tableSP;
 	}
 	
+	/**
+	 * <p>
+	 * Called from the button listener method. Updates the Table data
+	 * based on the selected button
+	 * </p>
+	 * @param e
+	 */
 	private void updateComparisonResultsTableModel(ActionEvent e) {
 		this.comparisonResultsTableModel.setColumnCount(0);
 		this.comparisonResultsTableModel.setRowCount(0);
@@ -228,6 +290,14 @@ public class MatchedRowsController extends Controller{
 	
 	//----------------------- Matched Rows --------------------------
 	
+	/**
+	 * <p>
+	 * Loads matched row data to the table. Uncaptured and Captured, depending on
+	 * selected button
+	 * </p>
+	 * @param rowIndexes Indexes from comparison for POS and selected file type
+	 * @param type The selected file type, Uncaptured or Captured
+	 */
 	private void setMatchedRowsToTableModel(List<ArrayList<Integer>> rowIndexes, FileType type){
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
 		List<String> requestIds = FileData.getFileModel(type).getFileContents().getRequestIds();
@@ -249,6 +319,10 @@ public class MatchedRowsController extends Controller{
 		}
 	}
 	
+	/**
+	 * <p>Loads the headers for the match selection</p>
+	 * @return Column count for table
+	 */
 	private int setHeadersForMatches(){
 		List<String> posHeaders = FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames();		
 		
@@ -263,6 +337,11 @@ public class MatchedRowsController extends Controller{
 	
 	//----------------------- Duplicated Rows --------------------------
 	
+	/**
+	 * <p>Loads the duplicated row data for selected file, Uncaptured or Captured</p>
+	 * @param rowIndexes Indexes for POS file, and the matched rows from the selected file
+	 * @param type The chosen file type, Uncaptured or Captured
+	 */
 	private void setDuplicateRowsToTableModel(List<ArrayList<Integer>> rowIndexes, FileType type) {
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
 		int headerCount = this.setHeadersForDups();
@@ -282,6 +361,11 @@ public class MatchedRowsController extends Controller{
 		}
 	}
 	
+	/**
+	 * <p>Concatenates the indexes of found duplicates to a single string</p>
+	 * @param row The row from the index list where the duplicated indexes are stored
+	 * @return The duplicated indexes in a single string
+	 */
 	private String concatDupRowNumbers(ArrayList<Integer> row) {
 		String result = "";
 		
@@ -295,6 +379,10 @@ public class MatchedRowsController extends Controller{
 		return result;
 	}
 	
+	/**
+	 * <p>Set the headers for the duplicated table data</p>
+	 * @return
+	 */
 	private int setHeadersForDups() {
 		List<String> posHeaders = FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames();
 		
@@ -308,6 +396,10 @@ public class MatchedRowsController extends Controller{
 	
 	//----------------------- Non Matched Rows --------------------------
 	
+	/**
+	 * <p>Sets the row data for POS rows with no found match</p>
+	 * @param rowIndexes
+	 */
 	private void setNoMatchesToTableModel(List<Integer> rowIndexes) {
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
 		int headerCount = this.setHeadersForNoMatches();
@@ -325,6 +417,10 @@ public class MatchedRowsController extends Controller{
 		}
 	}
 	
+	/**
+	 * <p>Headers for rows with no match table data</p>
+	 * @return
+	 */
 	private int setHeadersForNoMatches() {
 		List<String> posHeaders = FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames();
 		
