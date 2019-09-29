@@ -4,6 +4,7 @@ import com.freedompay.models.FileModel;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.views.View;
 import com.freedompay.util.FileType;
+import com.freedompay.util.UserMessages;
 import com.freedompay.util.Validation;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -192,7 +193,38 @@ public class FileController extends Controller  {
 		}
 		
 		if(e.getSource() == invalidRowsBtn) {
-			this.notifyObservers("MatchedRows");
+			if(!FileData.getIsPOSLoadedFlag()) {
+				UserMessages.noPOSFilePresent();
+			}else if(FileData.getFileCount() < 2) {
+				UserMessages.fileCountTooLow();
+			}else if(!validateHeaderCount(FileType.UNCAPTURED_AUTH) && !validateHeaderCount(FileType.CAPTURED)) {
+				UserMessages.invalidColumnSelectionCount();
+			}else{
+				this.notifyObservers("MatchedRows");	
+			}
+		}
+	}
+	
+	private boolean validateHeaderCount(FileType type) {
+		int count = 0;
+		int col = 0;
+		if(type == FileType.UNCAPTURED_AUTH) {
+			col = 1;
+		}
+		if(type == FileType.CAPTURED) {
+			col = 2;
+		}
+		
+		for(int i = 0; i < ColumnData.getTableData().getRowCount(); i++) {
+			if(ColumnData.getTableData().getValueAt(i, col) != null) {
+				count++;
+			}
+		}
+		
+		if(count >= 3) {
+			return true;
+		}else {
+			return false;
 		}
 	}
 

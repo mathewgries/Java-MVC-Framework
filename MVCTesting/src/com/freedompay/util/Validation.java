@@ -62,12 +62,15 @@ public class Validation {
 	 */
 	public static boolean isModelValid(FileModel model) {
 		if(!Validation.validateCSVFile(model.getName())) {
+			UserMessages.invlalidFileType();
 			return false;
 		}
 		if(!Validation.validateFileNotUploaded(model.getFile())) {
+			UserMessages.fileAlreadyLoaded();
 			return false;
 		}
 		if(model.getFileType() != FileType.POS && Validation.validateRequestIdExists(model) == -1) {
+			UserMessages.noRequestId();
 			return false;
 		}
 		return true;
