@@ -27,7 +27,6 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * <p>

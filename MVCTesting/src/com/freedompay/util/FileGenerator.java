@@ -45,6 +45,12 @@ public class FileGenerator {
 
 //===========================================================================
 	
+	/**
+	 * <p>Export the Matched Rows file to disk</p>
+	 * @param rowIndexes The matched indexes of the POS file, and the given file type - Uncaptured or Captured
+	 * @param type The type of file matched against the POS file - Uncaptured or Captured 
+	 * @param filename The name for the file being created
+	 */
 	public static void exportMatchFile(List<ArrayList<Integer>> rowIndexes, FileType type, String filename){
 		
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
@@ -70,6 +76,10 @@ public class FileGenerator {
 		FileGenerator.createFile(forExport, filename, FileGenerator.matchDirectory);
 	}
 	
+	/**
+	 * <p>Set up the headers for the matched rows file</p>
+	 * @return The headers for the file
+	 */
 	private static String[] setHeadersForMatchFileExport(){
 		List<String> posHeaders = FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames();
 		String[] headers = new String[posHeaders.size() + 3];
@@ -91,7 +101,12 @@ public class FileGenerator {
 
 //===========================================================================
 
-	
+	/**
+	 * <p>Export the duplicate matched rows file </p>
+	 * @param rowIndexes The indexes of the POS file that matched more than once on the given file - Uncaptured or Captured
+	 * @param type The file matched on the POS file - Uncaptured or Captured
+	 * @param filename The name of the file being created
+	 */
 	public static void exportDuplicateRowsFiles(List<ArrayList<Integer>> rowIndexes, FileType type, String filename) {
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
 		List<ArrayList<String>> forExport = new ArrayList<ArrayList<String>>();
@@ -115,6 +130,11 @@ public class FileGenerator {
 		FileGenerator.createFile(forExport, filename, FileGenerator.duplicateDirectory);
 	}
 	
+	/**
+	 * <p>Concatenate the indexes from the Captured or Uncaptured file</p>
+	 * @param row The index of the list being pulled against
+	 * @return The concatenated indexes to String
+	 */
 	private static String concatDupRowNumbers(ArrayList<Integer> row) {
 		String result = "";
 		
@@ -128,6 +148,10 @@ public class FileGenerator {
 		return result;
 	}
 	
+	/**
+	 * <p>Set the headers for the duplicate match file</p>
+	 * @return The headers for the file
+	 */
 	private static String[] setHeadersForDupFileExport() {
 		List<String> posHeaders = FileData.getFileModel(FileType.POS).getFileContents().getHeaderNames();
 		String[] headers = new String[posHeaders.size() + 2];
@@ -148,6 +172,11 @@ public class FileGenerator {
 
 //==========================================================================
 
+	/**
+	 * <p>Export the no matched rows file</p>
+	 * @param rowIndexes The indexes of the POS file that weren't matched
+	 * @param filename The name of the file being exported 
+	 */
 	public static void exportNoMatchFile(List<Integer> rowIndexes, String filename) {
 		List<ArrayList<String>> posRows = FileData.getFileModel(FileType.POS).getFileContents().getFileRows();
 		List<ArrayList<String>> forExport = new ArrayList<ArrayList<String>>();
@@ -192,6 +221,12 @@ public class FileGenerator {
 
 //===========================================================================
 	
+	/**
+	 * <p>The final file export step. Create the file and save to a directory<p>
+	 * @param fileRows The list to create the file with
+	 * @param fileName The name of the file being created
+	 * @param directory The directory on disk to save the file
+	 */
 	private static void createFile(List<ArrayList<String>> fileRows, String fileName, String directory) {
 		try {
 			String filePath = directory + "\\" + fileName + "_" + getDateForFileName() + ".csv";
@@ -213,7 +248,9 @@ public class FileGenerator {
 		}
 	}
 	
-	
+	/**
+	 * <p>Once the files are saved, open the directory where they were stored on disk</p>
+	 */
 	public static void openResultsDirectory() {
 		try {
 			File file = new File(FileGenerator.parentDirectory);
