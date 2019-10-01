@@ -447,6 +447,9 @@ public class MatchedRowsController extends Controller{
 
 //===========================================================================
 	
+	/**
+	 * <p>Export the results of the comparison to file on disk</p>
+	 */
 	private void exportResults() {
 		if(Comparison.getUncapturedLoadedFlag()) {
 			if(Comparison.getMatchedRowsUncapturedIndexes() != null && Comparison.getMatchedRowsUncapturedIndexes().size() > 0) {
