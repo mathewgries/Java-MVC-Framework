@@ -17,6 +17,7 @@ import com.freedompay.data.FileData;
 import com.freedompay.models.FileModel;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.util.Comparison;
+import com.freedompay.util.FileGenerator;
 import com.freedompay.util.FileType;
 import com.freedompay.views.View;
 
@@ -95,6 +96,7 @@ public class MatchedRowsController extends Controller{
 	private JButton duplicateCapturedBtn;
 	private JButton noMatchBtn;
 	private JButton backBtn;
+	private JButton exportBtn;
 	
 	/**
 	 * <p>Button to view matched rows from Uncaptured file</p>
@@ -153,6 +155,12 @@ public class MatchedRowsController extends Controller{
 		this.backBtn.addActionListener(this);
 		return this.backBtn;
 	}
+	
+	public JButton getExportBtn() {
+		this.exportBtn = new JButton("Export Results");
+		this.exportBtn.addActionListener(this);
+		return this.exportBtn;
+	}
 
 	// ----------- BUTTON ACTION LISTENER ----------------------------
 
@@ -164,6 +172,8 @@ public class MatchedRowsController extends Controller{
 		// Go back to FilesView
 		if(e.getSource() == backBtn) {
 			this.notifyObservers("Files");
+		}else if(e.getSource() == exportBtn) {
+			this.exportResults();
 		}else {
 			// Update the table view
 			this.updateComparisonResultsTableModel(e);
@@ -431,4 +441,35 @@ public class MatchedRowsController extends Controller{
 		return this.comparisonResultsTableModel.getColumnCount();
 	}
 	
+//===========================================================================
+
+				// EXPORT RESULTS TO FILE
+
+//===========================================================================
+	
+	private void exportResults() {
+		if(Comparison.getUncapturedLoadedFlag()) {
+			if(Comparison.getMatchedRowsUncapturedIndexes() != null && Comparison.getMatchedRowsUncapturedIndexes().size() > 0) {
+				FileGenerator.exportMatchFile(Comparison.getMatchedRowsUncapturedIndexes(), FileType.UNCAPTURED_AUTH, "MatchedUncapturedAuthorizations");
+			}
+			if(Comparison.getDuplicateRowsUncapturedIndexes() != null && Comparison.getDuplicateRowsUncapturedIndexes().size() > 0) {
+				FileGenerator.exportDuplicateRowsFiles(Comparison.getDuplicateRowsUncapturedIndexes(), FileType.UNCAPTURED_AUTH, "DuplicateMatchesUncapturedAuthorization");
+			}
+		}
+		
+		if(Comparison.getCapturedLoadedFlag()) {
+			if(Comparison.getMatchedRowsCapturedIndexes() != null && Comparison.getMatchedRowsCapturedIndexes().size() > 0) {
+				FileGenerator.exportMatchFile(Comparison.getMatchedRowsCapturedIndexes(), FileType.CAPTURED, "MatchedCapturedSettlements");
+			}
+			if(Comparison.getDuplicateRowsCapturedIndexes() != null && Comparison.getDuplicateRowsCapturedIndexes().size() > 0) {
+				FileGenerator.exportDuplicateRowsFiles(Comparison.getDuplicateRowsCapturedIndexes(), FileType.CAPTURED, "DuplicateMatchesCapturedSettlements");
+			}
+		}
+		
+		if(Comparison.getNoMatches() != null && Comparison.getNoMatches().size() > 0) {
+			FileGenerator.exportNoMatchFile(Comparison.getNoMatches(), "NoMatchesFound");
+		}
+		
+		FileGenerator.openResultsDirectory();
+	}
 }

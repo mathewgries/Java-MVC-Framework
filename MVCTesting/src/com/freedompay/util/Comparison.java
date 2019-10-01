@@ -99,6 +99,16 @@ public class Comparison {
 
 //======================================================================================
 	
+	//--------------------------- Get Loaded Flags -----------------------------
+	
+	public static boolean getUncapturedLoadedFlag() {
+		return Comparison.uncapturedLoaded;
+	}
+	
+	public static boolean getCapturedLoadedFlag() {
+		return Comparison.capturedLoaded;
+	}
+	
 	//--------------------------- UNCAPTURED LISTS -------------------------------
 	
 	/**
