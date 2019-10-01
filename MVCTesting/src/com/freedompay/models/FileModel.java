@@ -1,13 +1,6 @@
 package com.freedompay.models;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import com.freedompay.util.FileType;
-import com.freedompay.util.Validation;
 
 /**
  * <p>

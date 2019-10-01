@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.freedompay.data.FileData;
 import com.freedompay.util.FileType;
 
 /**
