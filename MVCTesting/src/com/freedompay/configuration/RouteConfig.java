@@ -6,7 +6,6 @@ import com.freedompay.views.*;
 import com.freedompay.services.IRouteListener;
 import com.freedompay.services.IRouteService;
 import com.freedompay.util.Comparison;
-import com.freedompay.util.FileType;
 import com.freedompay.util.Validation;
 
 import java.util.ArrayList;
