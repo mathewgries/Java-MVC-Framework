@@ -288,7 +288,7 @@ public class FileController extends Controller  {
 	 */
 	private void openFileChooser(FileType type) {
 		try {
-			JFileChooser fc = new JFileChooser("C:\\users\\mgries\\eclipse-workspace\\testfiles\\containsnullorempty");
+			JFileChooser fc = new JFileChooser("C:\\");
 			int choice = fc.showDialog(this.view, "Add File");
 			if(choice == JFileChooser.APPROVE_OPTION) {
 				FileModel model = new FileModel(fc.getSelectedFile(), type);

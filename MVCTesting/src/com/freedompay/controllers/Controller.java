@@ -93,6 +93,8 @@ public class Controller implements IRouteService, ActionListener, ListSelectionL
 	
 	public JButton getDuplicateCapturedBtn() {return null;}
 	
+	public JButton getExportBtn() {return null;}
+	
 	//------------------ JPANEL COMPONENTS ---------------------
 	
 	public JPanel getPOSColumnList() {return null;}

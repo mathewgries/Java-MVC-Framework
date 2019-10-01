@@ -122,13 +122,14 @@ public class MatchedRowsView extends View {
 	 */
 	private JPanel buildBtnPanel() {
 		JPanel p = new JPanel();
-		p.setLayout(new GridLayout(3,2));
+		p.setLayout(new GridLayout(4,2));
 		
 		JButton matchedUncapturedBtn = this.controller.getMatchedUncapturedBtn();
 		JButton matchedCapturedBtn = this.controller.getMatchedCapturedBtn();
 		JButton duplicateUncapturedBtn = this.controller.getDuplicateUncapturedBtn();
 		JButton duplicateCapturedBtn = this.controller.getDuplicateCapturedBtn();
 		JButton noMatchBtn = this.controller.getNoMatchBtn();
+		JButton exportBtn = this.controller.getExportBtn();
 		JButton backBtn = this.controller.getBackBtn();
 		
 		p.add(matchedUncapturedBtn);
@@ -136,6 +137,7 @@ public class MatchedRowsView extends View {
 		p.add(duplicateUncapturedBtn);
 		p.add(duplicateCapturedBtn);
 		p.add(noMatchBtn);
+		p.add(exportBtn);
 		p.add(backBtn);
 		return p;
 	}
